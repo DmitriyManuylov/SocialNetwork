@@ -5,14 +5,16 @@ namespace SocialNetwork.Models
 {
     public class FriendshipFact
     {
-
+        //public int Id { get; set; }
         [Required]
-        public string UserId { get; set; }
-        public NetworkUser User { get; set; }
+        public string InitiatorId { get; set; }
+        public NetworkUser Initiator { get; set; }
         [Required]
-        public string FriendId { get; set; }
-        public NetworkUser Friend { get; set; }
-
+        public string InvitedId { get; set; }
+        public NetworkUser Invited { get; set; }
+        [Required]
+        public bool RequestAccepted { get; set; }
+        [Required]
         public DateTime DateOfConclusion { get; set; }
     }
 }

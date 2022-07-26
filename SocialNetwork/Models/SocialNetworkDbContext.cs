@@ -28,25 +28,24 @@ namespace SocialNetwork.Models
             base.OnModelCreating(builder);
 
             builder.Entity<NetworkUser>()
-                    .HasMany(user => user.Friends)
-                    .WithMany(user => user.Friends)
-                    .UsingEntity<FriendshipFact>(
-                    j => j
-                    .HasOne(f => f.Friend2)
-                    .WithMany(user => user.FriendshipFacts)
-                    .HasForeignKey(f => f.Friend2Id),
-                    j => j
-                    .HasOne(f => f.Friend1)
-                    .WithMany(user => user.FriendshipFacts)
-                    .HasForeignKey(f => f.Friend1Id),
-                    j =>
-                    {
-                        j.HasKey(fr => new { fr.Friend1Id, fr.Friend2Id });
-                        j.ToTable(nameof(FriendshipFact) + 's');
-                    });
+                .HasMany(user => user.FriendsIn)
+                .WithMany(user => user.FriendsOut)
+                .UsingEntity<FriendshipFact>(
+                 ff => ff
+                    .HasOne(ff => ff.Initiator)
+                    .WithMany(user => user.FriendshipFactsIn)
+                    .HasForeignKey(ff => ff.InitiatorId)
+                    .OnDelete(DeleteBehavior.ClientCascade),
+                 ff => ff
+                    .HasOne(ff => ff.Invited)
+                    .WithMany(user => user.FriendshipFactsOut)
+                    .HasForeignKey(ff => ff.InvitedId)
+                    .OnDelete(DeleteBehavior.ClientCascade),
+                 ff =>
+                 {
+                     ff.ToTable(nameof(FriendshipFact) + 's');
+                 });
 
-
-                
         }
 
     }

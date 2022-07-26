@@ -20,8 +20,17 @@ namespace SocialNetwork.Models
             CityId = cityId;
         }
         
-        public ICollection<FriendshipFact> FriendshipFacts { get; set; }
-        public ICollection<NetworkUser> Friends{ get; set; }
+        public ICollection<FriendshipFact> FriendshipFactsIn { get; set; }
+
+        public ICollection<FriendshipFact> FriendshipFactsOut { get; set; }
+        /// <summary>
+        /// Пригласившие друзья
+        /// </summary>
+        public ICollection<NetworkUser> FriendsIn { get; set; }
+        /// <summary>
+        /// Приглашенные друзья
+        /// </summary>
+        public ICollection<NetworkUser> FriendsOut { get; set; }
         public ICollection<GroupChat> Chats { get; set; }
         public string FirstName { get; set; }
         public string Surname { get; set; }
