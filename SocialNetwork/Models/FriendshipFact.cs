@@ -7,11 +7,11 @@ namespace SocialNetwork.Models
     {
 
         [Required]
-        public string Friend1Id { get; set; }
-        public NetworkUser Friend1 { get; set; }
+        public string UserId { get; set; }
+        public NetworkUser User { get; set; }
         [Required]
-        public string Friend2Id { get; set; }
-        public NetworkUser Friend2 { get; set; }
+        public string FriendId { get; set; }
+        public NetworkUser Friend { get; set; }
 
         public DateTime DateOfConclusion { get; set; }
     }
