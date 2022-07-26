@@ -1,0 +1,50 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Home Page";
+}
+
+<div id="myDiv" class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>    
+</div>
+<div id="formId" class="text-center">
+    <label for="senderInput"></label>
+    <p>
+        <label for="senderInput">Имя пользователя</label>
+        <input type="text" id="senderInput" placeholder="Имя пользователя"/>
+    </p>
+    <p>
+        <label for="messageInput">Текст сообщения</label>
+        <input type="text" id="messageInput" placeholder="Текст сообщения"/>
+    </p>
+    <p><input type="button" id="sendBtn" value="Отправить" /></p>
+</div>
+<div>
+    <a asp-action="Register" asp-controller="Account">Зарегистрироваться</a>
+    <a asp-action="Login" asp-controller="Account">Войти</a>
+</div>
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script>
+    var hubConnection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
+    //console.log(hubConnection.baseUrl);
+    hubConnection.on("Recieve", function(sender, message)
+        {
+        var myDiv = document.getElementById("myDiv");
+        var messItem = document.createElement("p");
+        messItem.innerHTML = sender + ": " + message + "(" + hubConnection.connectionId + ")";
+        myDiv.appendChild(messItem);
+        });
+
+    let sendMessageButton = document.getElementById("sendBtn");
+
+    sendMessageButton.addEventListener("click", function(e) {
+        let sender = document.getElementById("senderInput").value;
+        let message = document.getElementById("messageInput").value;
+        hubConnection.invoke("Send", sender, message);
+    });
+
+
+    hubConnection.start();
+
+</script>
