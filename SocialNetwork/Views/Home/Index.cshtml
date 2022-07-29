@@ -1,13 +1,61 @@
 ﻿@{
-    Layout = "_Layout";
+    Layout = "_MainLayout";
     ViewData["Title"] = "Home Page";
 }
 
-<div id="myDiv" class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>    
+<div class="chat-block">
+    <h2 class="text-center">Простой чат без регистрации</h2>
+    <div id="liteChat" class="lite-chat">
+        
+        <div id="roomsList" class="flex-item side-bar">
+            <div class="border-bottom-double">
+                <h3>Комнаты</h3>
+            </div>
+            <div>
+                <button id="butCreateRoom">Создать комнату</button>
+            </div>
+
+        </div>
+        <div id="chat" class="flex-item">
+            <h3>Чат</h3>
+            <div id="innerChatField">
+
+            </div>
+        </div>
+        <div id="rightSide" class="flex-item side-bar">
+    
+        </div>
+    </div>
 </div>
-<div id="formId" class="text-center">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="formId" class="footer">
     <label for="senderInput"></label>
     <p>
         <label for="senderInput">Имя пользователя</label>
@@ -19,15 +67,13 @@
     </p>
     <p><input type="button" id="sendBtn" value="Отправить" /></p>
 </div>
-<div>
-    <a asp-action="Register" asp-controller="Account">Зарегистрироваться</a>
-    <a asp-action="Login" asp-controller="Account">Войти</a>
-</div>
+
+
 
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
 <script>
     var hubConnection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
-    //console.log(hubConnection.baseUrl);
+    
     hubConnection.on("Recieve", function(sender, message)
         {
         var myDiv = document.getElementById("myDiv");
@@ -38,6 +84,9 @@
 
     let sendMessageButton = document.getElementById("sendBtn");
 
+var xhr = new XMLHttpRequest();
+xhr.open("POST", "/Home/Index");
+//xhr.get
     sendMessageButton.addEventListener("click", function(e) {
         let sender = document.getElementById("senderInput").value;
         let message = document.getElementById("messageInput").value;
@@ -45,6 +94,6 @@
     });
 
 
-    hubConnection.start();
-
+    hubConnection.start().then(() => console.log(hubConnection.baseUrl + " " + hubConnection.));
+    
 </script>

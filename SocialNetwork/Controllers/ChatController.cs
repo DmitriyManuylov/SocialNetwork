@@ -1,23 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using SocialNetwork.Models;
 using System.IO;
-using System.Net.WebSockets;
 
 namespace SocialNetwork.Controllers
 {
     public class ChatController : Controller
     {
-        FileStream _stream;
-        string path = "";
-        public IActionResult JointoChat()
+        IHubContext<ChatHub> _hubContext { get; set; }  
+        public ChatController(IHubContext<ChatHub> hubContext)
         {
+            
+            _hubContext = hubContext;
+        }
 
-            _stream = new FileStream(path, FileMode.OpenOrCreate);
-
-            //WebSocket webSocket = WebSocketProtocol.CreateFromStream(_stream, true, WebSocket., WebSocket.DefaultKeepAliveInterval);
-            //webSocket.
+        [Authorize]
+        public IActionResult Chat()
+        {
+           // _hubContext.Clients.Client("").
             return View();
         }
 
-        
+        public IActionResult Send(Message message)
+        {
+
+            return View(message);
+        }
     }
 }

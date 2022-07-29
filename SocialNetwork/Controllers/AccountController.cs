@@ -17,7 +17,7 @@ namespace SocialNetwork.Controllers
         SignInManager<NetworkUser> _signInManager;
         public AccountController(UserManager<NetworkUser> userManager, SignInManager<NetworkUser> signInManager, SocialNetworkDbContext dbContext)
         {
-
+            //dbContext.Users.Where(user => user.BirthDate < System.DateTime.Now).Wh
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -109,6 +109,20 @@ namespace SocialNetwork.Controllers
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult Settings()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult Settings(NetworkUser User)
+        {
+            return View();
         }
     }
 }

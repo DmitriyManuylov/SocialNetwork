@@ -9,6 +9,10 @@ namespace SocialNetwork.Models.ViewModels
         [Display(Name = "Имя пользователя")]
         public string Name { get; set; }
 
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
         [Required(ErrorMessage = "Введите адрес электронной почты")]
         [Display(Name = "Адрес электронной почты")]
         [DataType(DataType.EmailAddress)]
@@ -23,5 +27,6 @@ namespace SocialNetwork.Models.ViewModels
         [DataType(DataType.Password)]
         public string PasswordConfirm { get; set; }
 
+        public int? CityId { get; set; }
     }
 }

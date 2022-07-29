@@ -1,3 +1,4 @@
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -52,6 +53,8 @@ namespace SocialNetwork
             .AddCookie(options =>
             {
                 options.LoginPath = new PathString("/Account/Register");
+                options.LogoutPath = new PathString("/Home/Index");
+                options.AccessDeniedPath = new PathString("/Home/Index");
             });
             services.AddAuthorization(options =>
             {

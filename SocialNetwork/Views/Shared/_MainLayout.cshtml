@@ -1,0 +1,43 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SocialNetwork</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/StyleSheet.css?v=<?= time(); ?>" />
+</head>
+<body>
+    <div id="networkHeader">
+        <div id="networkHeaderLink">
+            <a asp-action="Index" asp-controller="Home">4ЕБУР.НЕТЪ</a>
+        </div>
+        
+        <div id="networkHeaderLogin">
+            @if(_signInManager.IsSignedIn(User))
+            {
+                <span>Здравствуйте, @User.Identity.Name!</span>
+                <a asp-action="Logout" asp-controller="Account">Выйти из 4ЕБУР.НЕТа</a>
+            }
+            else
+            {
+                <a asp-action="Register" asp-controller="Account">Зарегистрироваться</a>
+                <a asp-action="Login" asp-controller="Account">Войти</a>
+            }
+        </div>
+    </div>
+    <div id="networkBody">
+        @RenderBody()
+    </div>
+    
+</body>
+</html>

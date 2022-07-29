@@ -26,7 +26,8 @@ namespace SocialNetwork.Models
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            builder.Entity<NetworkUser>().Property(user => user.UserName).IsRequired();
+            builder.Entity<NetworkUser>().Property(user => user.PasswordHash).IsRequired();
             builder.Entity<NetworkUser>()
                 .HasMany(user => user.FriendsIn)
                 .WithMany(user => user.FriendsOut)

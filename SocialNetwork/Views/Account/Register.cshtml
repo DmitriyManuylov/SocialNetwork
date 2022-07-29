@@ -5,7 +5,7 @@
 @model RegistrationModel
 @{
     ViewBag.Title = "Регистрация";
-    Layout = "_Layout";
+    Layout = "_MainLayout";
 }
 <div class="text-danger" asp-validation-summary="All"></div>
 <form id="registerForm" asp-action="Register" asp-controller="Account" method="post">

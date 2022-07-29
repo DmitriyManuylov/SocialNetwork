@@ -1,0 +1,157 @@
+﻿* {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+body {
+    background-color: #dee2e3;
+    overflow: hidden;
+}
+
+#networkHeader {
+    background-color: slategray;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 10;
+    justify-content: space-between;
+    height: var(--header-height);
+}
+
+#networkHeaderLink {
+    font-size: 3rem;
+    font-weight: 500;
+    margin-left: 100px;
+}
+    #networkHeaderLink a {
+        color: white;
+    }
+        #networkHeaderLink a:hover {
+            text-decoration: none;
+        }
+    
+
+#networkHeaderLogin {
+    
+}
+
+    #networkHeaderLogin a {
+        color: white;
+        border: groove;
+        border-radius: 10px;
+        margin-right: 50px;
+        padding: 5px;
+    }
+
+        #networkHeaderLogin a:hover {
+            color: #fc7019;
+            background-color: slategrey;
+            text-decoration: none;
+        }
+.flex-container {
+    
+}
+    
+#networkBody {
+    margin-top: var(--header-height);
+    height: 1000px;
+    min-height: 500px;
+}
+
+
+
+
+.header-side {
+    font-weight: 200;
+    font-size: large;
+}
+    .header-side a {
+        position:relative;
+        text-align: center;
+        width: 100%;
+        padding: 5px;
+        height: var(--header-height-login);
+    }
+
+.header-left {
+    margin-left: 20px;
+    text-align: left;
+}
+.header-right {
+    margin-right: 20px;
+    text-align: right;
+}
+
+#networkLink a {
+    border: unset;
+    border-radius: 0;
+    text-decoration: none;
+    padding: 0;
+}
+
+
+.lite-chat {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+}
+
+.flex-item {
+    text-align: center;
+    height: 100%;
+    background-color: slategray;
+}
+.side-bar {
+    background-color: #f2f4f5;
+}
+#roomsList {
+    width: 20%;
+}
+
+#chat {
+    width: 60%;
+}
+#rightSide {
+    width: 20%;
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    bottom: 0vh;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.border-bottom-double {
+    border-bottom:double;
+    border-bottom-color: lightslategrey;
+}
+
+:root {
+    --header-height: 75px;
+    --header-height-login: 40px;
+}
+
+
+#chat {
+    
+    z-index: 5;
+    box-shadow: 5px 5px 10px 2px #000000, -5px -5px 10px 2px #000000;
+}
+
+#innerChatField {
+    margin: 5%;
+    border-radius: 30px;
+    width: 90%;
+    height: 85%;
+    background-color: white;
+    z-index:7;
+}

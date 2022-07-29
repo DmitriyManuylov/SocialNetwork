@@ -17,9 +17,9 @@ namespace SocialNetwork.Controllers
 
         private readonly ILogger<HomeController> _logger;
         IHubContext<ChatHub> _hubContext;
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IHubContext<ChatHub> hubContext)
         {
-            //_hubContext = hubContext;
+            _hubContext = hubContext;
             _logger = logger;
         }
 
