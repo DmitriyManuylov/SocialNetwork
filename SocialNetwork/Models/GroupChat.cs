@@ -7,9 +7,9 @@ namespace SocialNetwork.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<NetworkUser> Users { get; set; }
+        public List<NetworkUser> Users { get; set; }
 
-        public ICollection<Message> Messages { get; set; }
+        public List<Message> Messages { get; set; }
 
 
     }

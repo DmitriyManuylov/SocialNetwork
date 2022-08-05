@@ -2,7 +2,7 @@
 
 namespace SocialNetwork.Models.ViewModels
 {
-    public class RegistrationModel
+    public class RegisterViewModel
     {
 
         [Required(ErrorMessage = "Введите имя пользователя")]

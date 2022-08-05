@@ -2,7 +2,7 @@
 
 namespace SocialNetwork.Models.ViewModels
 {
-    public class LoginModel
+    public class LoginViewModel
     {
         [Required]
         public string Name { get; set; }

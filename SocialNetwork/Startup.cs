@@ -10,11 +10,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SocialNetwork.Models;
+using SocialNetwork.Models.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 
 namespace SocialNetwork
 {
@@ -36,6 +38,7 @@ namespace SocialNetwork
 
             services.AddDbContext<SocialNetworkDbContext>(options => options.UseSqlServer(connectionString));
             services.AddDbContext<NetworkUsersDbContext>(options => options.UseSqlServer(identityConnectionString));
+            services.AddScoped<ILiteChatRoomsRepository, EFLiteChatRoomsRepository>();
 
             services.AddIdentity<NetworkUser, IdentityRole>(options =>
             {
@@ -44,10 +47,11 @@ namespace SocialNetwork
             .AddEntityFrameworkStores<SocialNetworkDbContext>()
             .AddDefaultTokenProviders();
 
-            services.AddSignalR().AddJsonProtocol();
+            services.AddSignalR().AddJsonProtocol().AddMessagePackProtocol();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddNewtonsoftJson();
 
+            
             _services = services;
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
@@ -58,7 +62,7 @@ namespace SocialNetwork
             });
             services.AddAuthorization(options =>
             {
-                
+
             });
 
             services.AddSingleton(_services);

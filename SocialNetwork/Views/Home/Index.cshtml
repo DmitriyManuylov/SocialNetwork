@@ -1,99 +1,56 @@
 ﻿@{
     Layout = "_MainLayout";
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Chat";
 }
-
-<div class="chat-block">
-    <h2 class="text-center">Простой чат без регистрации</h2>
-    <div id="liteChat" class="lite-chat">
-        
-        <div id="roomsList" class="flex-item side-bar">
-            <div class="border-bottom-double">
+<div id="chatBlock">
+    <h2 id="chatHeader" class="text-center">Простой чат без регистрации</h2>
+    <div id="liteChat">
+        <div id="roomsWrap" class="flex-item side-bar">
+            <div id="roomsHeader" class="border-bottom-double">
                 <h3>Комнаты</h3>
             </div>
             <div>
                 <button id="butCreateRoom">Создать комнату</button>
             </div>
+            <div id="roomsListWrap" class="">
+                <div id="roomsList">
+
+                </div>
+            </div>
 
         </div>
         <div id="chat" class="flex-item">
-            <h3>Чат</h3>
             <div id="innerChatField">
+                <div id="messagesAreaWrap">
 
+                    <div id="messagesArea">
+                        
+                    </div>
+                </div>
+                <div id="sendMessage" class="footer">
+                    
+                    <div id="messageInput">
+                        <textarea placeholder="Текст сообщения"></textarea>
+                    </div>
+                </div>
+                
             </div>
         </div>
         <div id="rightSide" class="flex-item side-bar">
-    
+
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div id="formId" class="footer">
-    <label for="senderInput"></label>
-    <p>
-        <label for="senderInput">Имя пользователя</label>
-        <input type="text" id="senderInput" placeholder="Имя пользователя"/>
-    </p>
-    <p>
-        <label for="messageInput">Текст сообщения</label>
-        <input type="text" id="messageInput" placeholder="Текст сообщения"/>
-    </p>
-    <p><input type="button" id="sendBtn" value="Отправить" /></p>
-</div>
-
-
-
+<dialog id="createRoomDialog" class="network-dialog">
+    <h2>Создание комнаты</h2>
+    <input type="text" placeholder="Название комнаты"/>
+    <button type="button">Создать</button>
+</dialog>
+<dialog id="userNameDialog" class="network-dialog">
+    <h2>Назовитесь, товарищ!</h2>
+    <input type="text" id="senderInput" placeholder="Имя пользователя"/>
+    <button type="button">Утвердить</button>
+</dialog>
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
-<script>
-    var hubConnection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
-    
-    hubConnection.on("Recieve", function(sender, message)
-        {
-        var myDiv = document.getElementById("myDiv");
-        var messItem = document.createElement("p");
-        messItem.innerHTML = sender + ": " + message + "(" + hubConnection.connectionId + ")";
-        myDiv.appendChild(messItem);
-        });
-
-    let sendMessageButton = document.getElementById("sendBtn");
-
-var xhr = new XMLHttpRequest();
-xhr.open("POST", "/Home/Index");
-//xhr.get
-    sendMessageButton.addEventListener("click", function(e) {
-        let sender = document.getElementById("senderInput").value;
-        let message = document.getElementById("messageInput").value;
-        hubConnection.invoke("Send", sender, message);
-    });
-
-
-    hubConnection.start().then(() => console.log(hubConnection.baseUrl + " " + hubConnection.));
-    
-</script>
+<script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
+<script src="/js/LiteChat.js"></script>

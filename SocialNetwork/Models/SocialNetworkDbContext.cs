@@ -18,6 +18,9 @@ namespace SocialNetwork.Models
 
         public DbSet<City> Cities { get; set; }
 
+        public DbSet<SimpleMessage> SimpleMessages { get; set; }
+        public DbSet<LiteChatRoom> Rooms { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
@@ -46,6 +49,7 @@ namespace SocialNetwork.Models
                  {
                      ff.ToTable(nameof(FriendshipFact) + 's');
                  });
+
 
         }
 

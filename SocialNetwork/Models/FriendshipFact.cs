@@ -13,7 +13,7 @@ namespace SocialNetwork.Models
         public string InvitedId { get; set; }
         public NetworkUser Invited { get; set; }
         [Required]
-        public bool RequestAccepted { get; set; }
+        public bool RequestAccepted { get; set; } = false;
         [Required]
         public DateTime DateOfConclusion { get; set; }
     }

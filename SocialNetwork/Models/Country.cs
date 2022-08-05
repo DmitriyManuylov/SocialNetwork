@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace SocialNetwork.Models
 {
@@ -6,8 +7,9 @@ namespace SocialNetwork.Models
     {
         public int Id { get; set; }
 
+        [Required]
         public string Name { get; set; }
 
-        public ICollection<City> Cities;
+        public List<City> Cities;
     }
 }

@@ -17,13 +17,10 @@ namespace SocialNetwork.Controllers
         SignInManager<NetworkUser> _signInManager;
         public AccountController(UserManager<NetworkUser> userManager, SignInManager<NetworkUser> signInManager, SocialNetworkDbContext dbContext)
         {
-            //dbContext.Users.Where(user => user.BirthDate < System.DateTime.Now).Wh
             _userManager = userManager;
             _signInManager = signInManager;
         }
-        IPAddress adres = IPAddress.Parse("127.0.0.1");
-        IPEndPoint _ip;
-        TcpListener server;
+
         public IActionResult Index()
         {
             return View();
@@ -39,7 +36,7 @@ namespace SocialNetwork.Controllers
         [HttpPost]
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegistrationModel registrationModel)
+        public async Task<IActionResult> Register(RegisterViewModel registrationModel)
         {
             //HttpContext.Request.Form.
             if(!ModelState.IsValid)
@@ -63,7 +60,7 @@ namespace SocialNetwork.Controllers
                    ModelState.AddModelError("", error.Description);
                 return View(registrationModel);
             }
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", ""));
             
             
         }
@@ -77,7 +74,8 @@ namespace SocialNetwork.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginModel loginModel)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel loginModel)
         {
 
             if (!ModelState.IsValid)
@@ -97,7 +95,7 @@ namespace SocialNetwork.Controllers
 
             if (signInResult.Succeeded)
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
+                return RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", ""));
             }
 
             ModelState.AddModelError(nameof(loginModel.Password), "Неверный пароль");
