@@ -11,6 +11,6 @@ namespace SocialNetwork.Models
 
         public List<Message> Messages { get; set; }
 
-
+        public List<MembershipInChat> MembershipInChats { get; set; }
     }
 }

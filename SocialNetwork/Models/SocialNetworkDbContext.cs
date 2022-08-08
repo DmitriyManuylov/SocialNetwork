@@ -21,6 +21,10 @@ namespace SocialNetwork.Models
         public DbSet<SimpleMessage> SimpleMessages { get; set; }
         public DbSet<LiteChatRoom> Rooms { get; set; }
 
+        public DbSet<MembershipInChat> MembershipInChats { get; set; }
+
+        public DbSet<FriendshipFact> FriendshipFacts { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
@@ -45,12 +49,21 @@ namespace SocialNetwork.Models
                     .WithMany(user => user.FriendshipFactsOut)
                     .HasForeignKey(ff => ff.InvitedId)
                     .OnDelete(DeleteBehavior.ClientCascade),
-                 ff =>
-                 {
-                     ff.ToTable(nameof(FriendshipFact) + 's');
-                 });
+                 ff => ff.ToTable(nameof(FriendshipFact) + 's'));
 
-
+            builder.Entity<NetworkUser>()
+                .HasMany(user => user.Chats)
+                .WithMany(chat => chat.Users)
+                .UsingEntity<MembershipInChat>(
+                mic => mic
+                    .HasOne(mic => mic.Chat)
+                    .WithMany(chat => chat.MembershipInChats)
+                    .HasForeignKey(chat => chat.ChatId),
+                mic => mic
+                    .HasOne(mic => mic.User)
+                    .WithMany(user => user.MembershipInChats)
+                    .HasForeignKey(mic => mic.UserId),
+                mic => mic.ToTable("MembershipInChats"));
         }
 
     }

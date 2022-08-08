@@ -3,6 +3,7 @@ using SocialNetwork.Models.ViewModels;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System;
 
 namespace SocialNetwork.Models.Repositories
 {
@@ -31,7 +32,7 @@ namespace SocialNetwork.Models.Repositories
                                             { 
                                                 SenderName = message.Sender,
                                                 Text = message.Text,
-                                                DateTime = System.DateTime.Now,
+                                                DateTime = DateTime.Now,
                                                 RoomId = roomId,
                                                 Room = room
                                             };
@@ -65,9 +66,30 @@ namespace SocialNetwork.Models.Repositories
         /// <exception cref="LiteChatException"></exception>
         public LiteChatRoom GetLiteChatRoomById(int roomId)
         {
-            LiteChatRoom liteChatRoom = _dbContext.Rooms.Include(room => room.Messages).FirstOrDefault(room => room.Id == roomId);
+            LiteChatRoom liteChatRoom = _dbContext.Rooms.FirstOrDefault(room => room.Id == roomId);
             if (liteChatRoom == null) throw new LiteChatException("Комната чата не существует");
             return liteChatRoom;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <returns></returns>
+        /// <exception cref="LiteChatException"></exception>
+        public List<OutSimpleMessageViewModel> GetLiteChatMessagesToView(int roomId)
+        {
+            LiteChatRoom room = _dbContext.Rooms.FirstOrDefault(room => room.Id == roomId);
+            if (room == null) throw new LiteChatException("Комната чата не существует");
+            List<OutSimpleMessageViewModel> messages;
+            messages = _dbContext.SimpleMessages.Where(message => message.RoomId == roomId).Select(message => new OutSimpleMessageViewModel()
+            {
+                Id = message.Id,
+                Sender = message.SenderName,
+                Text = message.Text,
+                DateTime = message.DateTime.ToString("f")
+            }).ToList();        
+            return messages;
         }
     }
 }

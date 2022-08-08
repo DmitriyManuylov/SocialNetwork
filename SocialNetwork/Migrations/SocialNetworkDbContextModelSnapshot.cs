@@ -19,21 +19,6 @@ namespace SocialNetwork.Migrations
                 .HasAnnotation("ProductVersion", "5.0.17")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("GroupChatNetworkUser", b =>
-                {
-                    b.Property<int>("ChatsId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("ChatsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("GroupChatNetworkUser");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -165,22 +150,6 @@ namespace SocialNetwork.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.ChatRoom", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Rooms");
-                });
-
             modelBuilder.Entity("SocialNetwork.Models.City", b =>
                 {
                     b.Property<int>("Id")
@@ -252,6 +221,40 @@ namespace SocialNetwork.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Chats");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.LiteChatRoom", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.MembershipInChat", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ChatId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("UserId", "ChatId");
+
+                    b.HasIndex("ChatId");
+
+                    b.ToTable("MembershipInChats");
                 });
 
             modelBuilder.Entity("SocialNetwork.Models.Message", b =>
@@ -401,21 +404,6 @@ namespace SocialNetwork.Migrations
                     b.ToTable("SimpleMessages");
                 });
 
-            modelBuilder.Entity("GroupChatNetworkUser", b =>
-                {
-                    b.HasOne("SocialNetwork.Models.GroupChat", null)
-                        .WithMany()
-                        .HasForeignKey("ChatsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SocialNetwork.Models.NetworkUser", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -497,6 +485,25 @@ namespace SocialNetwork.Migrations
                     b.Navigation("Invited");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Models.MembershipInChat", b =>
+                {
+                    b.HasOne("SocialNetwork.Models.GroupChat", "Chat")
+                        .WithMany("MembershipInChats")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialNetwork.Models.NetworkUser", "User")
+                        .WithMany("MembershipInChats")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SocialNetwork.Models.Message", b =>
                 {
                     b.HasOne("SocialNetwork.Models.GroupChat", "Chat")
@@ -533,7 +540,7 @@ namespace SocialNetwork.Migrations
 
             modelBuilder.Entity("SocialNetwork.Models.SimpleMessage", b =>
                 {
-                    b.HasOne("SocialNetwork.Models.ChatRoom", "Room")
+                    b.HasOne("SocialNetwork.Models.LiteChatRoom", "Room")
                         .WithMany("Messages")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -542,12 +549,14 @@ namespace SocialNetwork.Migrations
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.ChatRoom", b =>
+            modelBuilder.Entity("SocialNetwork.Models.GroupChat", b =>
                 {
+                    b.Navigation("MembershipInChats");
+
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.GroupChat", b =>
+            modelBuilder.Entity("SocialNetwork.Models.LiteChatRoom", b =>
                 {
                     b.Navigation("Messages");
                 });
@@ -557,6 +566,8 @@ namespace SocialNetwork.Migrations
                     b.Navigation("FriendshipFactsIn");
 
                     b.Navigation("FriendshipFactsOut");
+
+                    b.Navigation("MembershipInChats");
                 });
 #pragma warning restore 612, 618
         }

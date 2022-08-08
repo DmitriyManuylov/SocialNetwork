@@ -1,0 +1,32 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_MainLayout";
+}
+@section Styles {
+
+}
+<div id="chatBlock">
+    <div id="liteChat">
+        <div id="roomsWrap" class="flex-item side-bar">
+            <div id="roomsHeader" class="border-bottom-double">
+                <h3>Товарищи</h3>
+            </div>
+            <div id="roomsListWrap" class="">
+                <div id="roomsList">
+
+                </div>
+            </div>
+
+        </div>
+        @await Html.PartialAsync("ChatFramePartial")
+        <div id="rightSide" class="flex-item side-bar">
+
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
+<script src="/js/LiteChat.js"></script>

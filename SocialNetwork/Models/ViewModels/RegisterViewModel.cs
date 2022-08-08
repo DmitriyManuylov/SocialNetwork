@@ -5,8 +5,8 @@ namespace SocialNetwork.Models.ViewModels
     public class RegisterViewModel
     {
 
-        [Required(ErrorMessage = "Введите имя пользователя")]
-        [Display(Name = "Имя пользователя")]
+        [Required(ErrorMessage = "Введите логин")]
+        [Display(Name = "Логин")]
         public string Name { get; set; }
 
         public string FirstName { get; set; }
@@ -23,6 +23,7 @@ namespace SocialNetwork.Models.ViewModels
         [Display(Name = "Пароль")]
         public string Password { get; set; }
 
+        [Display(Name = "Подтвердите пароль")]
         [Compare(nameof(Password), ErrorMessage = "Пароли не совпадают")]
         [DataType(DataType.Password)]
         public string PasswordConfirm { get; set; }

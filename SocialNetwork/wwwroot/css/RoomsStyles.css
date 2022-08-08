@@ -1,0 +1,55 @@
+﻿#roomsWrap {
+    width: 20%;
+    padding: 10px;
+    height: 100%;
+}
+
+#roomsHeader {
+}
+
+#butCreateRoom {
+    width: 100%;
+}
+
+#roomsListWrap {
+    overflow-y: scroll;
+    height: calc(100% - 80px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#roomsList {
+    border: double;
+    border-color: silver;
+    width: 100%;
+}
+
+.room-item {
+    border-color: slategrey;
+    border-style: double;
+    border-width: 3px;
+}
+
+    .room-item:hover {
+        background-color: silver;
+    }
+
+.room-item-selected {
+    background-color: darkslategrey;
+    color: #fc7019;
+}
+
+    .room-item-selected:hover {
+        background-color: slategray;
+    }
+
+#butCreateRoom {
+    border: double;
+    border-color: grey;
+    font-weight: 500;
+}
+
+    #butCreateRoom:hover {
+        background-color: silver;
+    }

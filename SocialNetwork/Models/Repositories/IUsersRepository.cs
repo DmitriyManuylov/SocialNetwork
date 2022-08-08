@@ -10,8 +10,8 @@ namespace SocialNetwork.Models.Repositories
 
         IQueryable<Country> Countries { get; }
 
-        
 
+        void InviteFriend(string invitorId, string invitedId);
         void AcceptFriendship(string invitorId, string invitedId);
         IQueryable<NetworkUser> FilterUsers(UsersFilter usersFilter);
         NetworkUser GetUserById(string Id);

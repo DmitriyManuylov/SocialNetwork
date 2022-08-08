@@ -14,19 +14,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SocialNetwork</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/StyleSheet.css?v=<?= time(); ?>" />
-    <link rel="stylesheet" href="/css/MessageStyle.css" />
+    <link rel="stylesheet" href="~/css/HeaderStyles.css" />
+    @RenderSection("Styles", false)
 </head>
 <body>
     <div id="networkHeader">
         <div id="networkHeaderLink">
-            <a asp-action="Index" asp-controller="Home">4ЕБУР.НЕТЪ</a>
+            <a asp-action="Chat" asp-controller="Chat">4ЕБУР.НЕТЪ</a>
         </div>
         
         <div id="networkHeaderLogin">
             @if(_signInManager.IsSignedIn(User))
             {
-                <span id="welcome">Здравствуйте, @User.Identity.Name!</span>
+                <span id="welcome">@User.Identity.Name!</span>
                 <a asp-action="Logout" asp-controller="Account">Выйти из 4ЕБУР.НЕТа</a>
             }
             else

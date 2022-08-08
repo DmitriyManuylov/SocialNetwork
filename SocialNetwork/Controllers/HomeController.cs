@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using SocialNetwork.Hubs;
 
 namespace SocialNetwork.Controllers
 {

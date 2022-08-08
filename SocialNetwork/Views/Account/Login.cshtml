@@ -8,27 +8,20 @@
     ViewBag.Title = "Авторизация";
     Layout = "_MainLayout";
 }
-<div class="text-danger" asp-validation-summary="All"></div>
-<form id="loginForm" asp-action="Login" asp-controller="Account" method="post">
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <div><span asp-validation-for="Name" class="text-danger"></span></div>
-        <input asp-for="Name" class="form-control"/>
-    </div>
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <div><span asp-validation-for="Password" class="text-danger"></span></div>
-        <input asp-for="Password"  class="form-control"/>
-    </div>
-    <button type="submit">Войти</button>
-    <div>
-        <a href="~/im.jpg" download="Класивая калтинка">Загрузить изображение</a>
-    </div>
-    <div>
-        <a href="~/Doyle A. C., Sir - The Complete Sherlock Holmes - (Knickerbocker Classics) - 2013.pdf" target="_blank">Загрузить книгу</a>
-    </div>
-    <div>
-        <a href="~/Firefox Installer.exe" target="_blank">Загрузить книгу</a>
-    </div>
+<div class="align-items-center flex-container flex-column">
+    <div class="text-danger w-25" asp-validation-summary="All"></div>
     
-</form>
+    <form id="loginForm" asp-action="Login" asp-controller="Account" method="post" class="w-25">
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <div><span asp-validation-for="Name" class="text-danger"></span></div>
+            <input asp-for="Name" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <div><span asp-validation-for="Password" class="text-danger"></span></div>
+            <input asp-for="Password"  class="form-control"/>
+        </div>
+        <button type="submit" class="btn-secondary">Войти</button>
+    </form>
+</div>

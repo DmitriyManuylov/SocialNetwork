@@ -12,6 +12,7 @@ using System.Net.WebSockets;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO.Pipelines;
+using SocialNetwork.Hubs;
 
 namespace SocialNetwork.Controllers
 {
@@ -26,6 +27,10 @@ namespace SocialNetwork.Controllers
             _hubContext = hubContext;
         }
 
+        public IActionResult Chat()
+        {
+            return View();
+        }
         public IActionResult Index()
         {
             List<LiteChatRoom> rooms = _chatRoomsRepository.Rooms;
@@ -60,11 +65,7 @@ namespace SocialNetwork.Controllers
             LiteChatRoom chatRoom = _chatRoomsRepository.GetLiteChatRoomById(roomId);
             await _hubContext.Groups.AddToGroupAsync(connectionId, chatRoom.Name);
             await _hubContext.Clients.Group(chatRoom.Name).SendAsync("GroupNotify", $"Пользователь {userName} присоединился к чату");
-            List<OutSimpleMessageViewModel> messages = new List<OutSimpleMessageViewModel>(chatRoom.Messages.Count);
-            foreach (var message in chatRoom.Messages)
-            {
-                messages.Add(new OutSimpleMessageViewModel() { Id = message.Id, Sender = message.SenderName, Text = message.Text, DateTime = message.DateTime.ToString() });
-            }
+            List<OutSimpleMessageViewModel> messages = _chatRoomsRepository.GetLiteChatMessagesToView(roomId);
             return Json(messages);
         }
 

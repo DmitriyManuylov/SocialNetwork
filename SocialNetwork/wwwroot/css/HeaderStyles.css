@@ -1,0 +1,61 @@
+﻿* {
+    padding: 0;
+    margin: 0;
+}
+
+
+body {
+    height: 100vh;
+    background-color: #dee2e3;
+    overflow: auto;
+}
+
+#networkHeader {
+    background-color: slategray;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 10;
+    justify-content: space-between;
+    height: var(--header-height);
+}
+
+#networkHeaderLink {
+    font-size: 3rem;
+    font-weight: 500;
+    margin-left: 100px;
+}
+
+    #networkHeaderLink a {
+        color: white;
+    }
+
+        #networkHeaderLink a:hover {
+            text-decoration: none;
+        }
+
+
+#networkHeaderLogin {
+}
+
+    #networkHeaderLogin a {
+        color: white;
+        border: groove;
+        border-radius: 10px;
+        margin-right: 50px;
+        padding: 5px;
+    }
+
+        #networkHeaderLogin a:hover {
+            color: #fc7019;
+            background-color: slategrey;
+            text-decoration: none;
+        }
+
+#welcome {
+    margin-right: 50px;
+}

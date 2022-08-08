@@ -9,5 +9,7 @@ namespace SocialNetwork.Models.Repositories
         LiteChatRoom CreateLiteChatRoom(string roomName);
         SimpleMessage SendMessageToLiteChatRoom(int roomId, InSimpleMessageViewModel message);
         LiteChatRoom GetLiteChatRoomById(int roomId);
+
+        List<OutSimpleMessageViewModel> GetLiteChatMessagesToView(int roomId);
     }
 }

@@ -22,6 +22,7 @@ namespace SocialNetwork.Models
             CityId = cityId;
         }
         
+        public List<MembershipInChat> MembershipInChats { get; set; }
         public List<FriendshipFact> FriendshipFactsIn { get; set; }
 
         public List<FriendshipFact> FriendshipFactsOut { get; set; }

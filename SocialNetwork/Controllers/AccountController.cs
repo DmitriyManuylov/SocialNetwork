@@ -93,13 +93,14 @@ namespace SocialNetwork.Controllers
 
             var signInResult = await _signInManager.PasswordSignInAsync(user, loginModel.Password, false, false);
 
-            if (signInResult.Succeeded)
+            if (!signInResult.Succeeded)
             {
-                return RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", ""));
+                ModelState.AddModelError(nameof(loginModel.Password), "Неверный пароль");
+                return View(loginModel);
+               
             }
 
-            ModelState.AddModelError(nameof(loginModel.Password), "Неверный пароль");
-            return View(loginModel);
+            return RedirectToAction(nameof(SocialNetworkController.Index), nameof(SocialNetworkController).Replace("Controller", ""));
 
         }
 

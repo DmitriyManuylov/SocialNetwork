@@ -17,6 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+using SocialNetwork.Hubs;
 
 namespace SocialNetwork
 {
@@ -37,8 +38,10 @@ namespace SocialNetwork
             string identityConnectionString = Configuration.GetConnectionString("IdentityConnection");
 
             services.AddDbContext<SocialNetworkDbContext>(options => options.UseSqlServer(connectionString));
-            services.AddDbContext<NetworkUsersDbContext>(options => options.UseSqlServer(identityConnectionString));
+
             services.AddScoped<ILiteChatRoomsRepository, EFLiteChatRoomsRepository>();
+            services.AddScoped<ISocialNetworkRepository, EFSocialNetworkRepository>();
+            services.AddScoped<IUsersRepository, EFUsersRepository>();
 
             services.AddIdentity<NetworkUser, IdentityRole>(options =>
             {
@@ -56,7 +59,7 @@ namespace SocialNetwork
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
-                options.LoginPath = new PathString("/Account/Register");
+                options.LoginPath = new PathString("/Account/Login");
                 options.LogoutPath = new PathString("/Home/Index");
                 options.AccessDeniedPath = new PathString("/Home/Index");
             });
@@ -97,8 +100,9 @@ namespace SocialNetwork
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Chat}/{action=Chat}/{id?}");
                 endpoints.MapHub<ChatHub>("/chat");
+                endpoints.MapHub<SocialNetworkHub>("/SocialNetwork");
             });
 
             //app.Run(async context =>
