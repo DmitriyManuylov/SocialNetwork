@@ -1,0 +1,47 @@
+﻿#socialNetworkBlock {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+#comrades {
+    height: 55%;
+    width: 100%;
+    border-style: double;
+    border-color: silver;
+    border-radius: 5px;
+}
+
+#comradesAreaWrap {
+    width: 100%;
+    height: calc(100% - 45px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+#comradesArea {
+    width: 100%;
+}
+#collectives {
+    height: 45%;
+    width: 100%;
+    border-style: double;
+    border-color: silver;
+    border-radius: 5px;
+}
+
+#collectivesAreaWrap {
+    width: 100%;
+    min-height: 50%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc(100% - 45px);
+}
+#collectivesArea {
+    width: 100%;
+}
+.border-bottom-list-header {
+    border-bottom: double;
+    border-bottom-color: silver;
+}

@@ -1,0 +1,69 @@
+[
+  
+  {
+    "outputFileName": "wwwroot/css/ListItemsStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/ListItemsStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/HtmlGeneration.min.js",
+    "inputFiles": [
+      "wwwroot/js/HtmlGeneration.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/SocialNetwork.min.js",
+    "inputFiles": [
+      "wwwroot/js/SocialNetwork.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/ViewModels.min.js",
+    "inputFiles": [
+      "wwwroot/js/ViewModels.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/LiteChat.min.js",
+    "inputFiles": [
+      "wwwroot/js/LiteChat.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/RoomsStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/RoomsStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/MessageStyle.min.css",
+    "inputFiles": [
+      "wwwroot/css/MessageStyle.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/LoginStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/LoginStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/LiteChatStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/LiteChatStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/GeneralChatStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/GeneralChatStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/HeaderStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/HeaderStyles.css"
+    ]
+  }
+]

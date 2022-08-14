@@ -1,0 +1,18 @@
+﻿.network-list-item {
+    border-color: slategrey;
+    border-style: double;
+    border-width: 3px;
+}
+
+    .network-list-item:hover {
+        background-color: silver;
+    }
+
+.network-list-item-selected {
+    background-color: darkslategrey;
+    color: #fc7019;
+}
+
+    .network-list-item-selected:hover {
+        background-color: slategray;
+    }
