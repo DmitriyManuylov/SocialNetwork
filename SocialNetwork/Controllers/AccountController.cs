@@ -4,10 +4,11 @@ using System.Net.Sockets;
 using Microsoft.AspNetCore.Authorization;
 using SocialNetwork.Models;
 using Microsoft.AspNetCore.Identity;
-using SocialNetwork.Models.ViewModels;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using SocialNetwork.Models.UserInfoModels;
+using SocialNetwork.Models.ViewModels.AccountViewModels;
 
 namespace SocialNetwork.Controllers
 {
@@ -107,7 +108,7 @@ namespace SocialNetwork.Controllers
         public async Task<IActionResult> LogoutAsync()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(ChatController.Chat), nameof(ChatController).Replace("Controller", ""));
         }
 
         [Authorize]

@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Models.ChatModels;
 using SocialNetwork.Models.Exceptions;
+using SocialNetwork.Models.UserInfoModels;
+using SocialNetwork.Models.ViewModels.SocialNetworkViewModels;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SocialNetwork.Models.Repositories
@@ -11,6 +15,33 @@ namespace SocialNetwork.Models.Repositories
         {
             _dbContext = dbContext;
         }
+
+        public List<ChatViewModel> AllChatsViewModel => _dbContext.Chats.Select(chat => new ChatViewModel()
+        {
+            Id = chat.Id,
+            Name = chat.Name,
+        }).ToList();
+
+        public List<ChatViewModel> GetUserChats(string userId)
+        {
+            IQueryable<ChatViewModel> chats = from chat in _dbContext.Chats
+                                              join mic in _dbContext.MembershipInChats on chat.Id equals mic.ChatId
+                                              where mic.UserId == userId
+                                              select new ChatViewModel
+                                              {
+                                                  Id = chat.Id,
+                                                  Name = chat.Name
+                                              };
+            return chats.ToList();
+        }
+
+        public GroupChat GetChatById(int chatId)
+        {
+            GroupChat chat = _dbContext.Chats.FirstOrDefault(chat => chat.Id == chatId);
+            if (chat == null) throw new ChatException("Чат с таким Id не существует");
+            return chat;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -33,17 +64,29 @@ namespace SocialNetwork.Models.Repositories
         /// <param name="chatId"></param>
         /// <param name="user"></param>
         /// <exception cref="ChatException"></exception>
-        public void JoinToChat(int chatId, string userId)
+        public GroupChat JoinToChat(int chatId, string userId)
         {
             GroupChat chat = _dbContext.Chats.FirstOrDefault(chat => chat.Id == chatId);
             if (chat == null) throw new ChatException("Чат не существует");
-            NetworkUser user = chat.Users.FirstOrDefault(dbUser => dbUser.Id == userId);
-            if (user != null)
+            NetworkUser user = _dbContext.Users.FirstOrDefault(dbUser => dbUser.Id == userId);
+            if (user == null) throw new NetworkUserException("Пользователь не существует");
+            var membershipInChat = _dbContext.Chats.Join(_dbContext.MembershipInChats,
+                                                         chat => chat.Id,
+                                                         mic => mic.ChatId,
+                                                         (chat, mic) => 1);
+            if(membershipInChat.Any())
             {
                 throw new ChatException("Пользователь уже состоит в данном чате");
             }
-            chat.Users.Add(user);
+            MembershipInChat mic = new MembershipInChat()
+            {
+                ChatId = chatId,
+                UserId = userId,
+                DateTime = System.DateTime.Now
+            };
+            _dbContext.MembershipInChats.Add(mic);
             _dbContext.SaveChanges();
+            return chat;
         }
         /// <summary>
         /// 
@@ -66,7 +109,6 @@ namespace SocialNetwork.Models.Repositories
 
             Message message = new Message() { SenderId = senderId, GroupChatId = chatId, Text = text, DateTime = System.DateTime.Now };
             _dbContext.Messages.Add(message);
-            chat.Messages.Add(message);
             _dbContext.SaveChanges();
             return message;
         }
@@ -76,7 +118,7 @@ namespace SocialNetwork.Models.Repositories
         /// <param name="chatId"></param>
         /// <param name="user"></param>
         /// <exception cref="ChatException"></exception>
-        public void LeaveFromChat(int chatId, string userId)
+        public GroupChat LeaveFromChat(int chatId, string userId)
         {
             GroupChat chat = _dbContext.Chats.FirstOrDefault(dbChat => dbChat.Id == chatId);
             if (chat == null) throw new ChatException("Чат не существует");
@@ -86,10 +128,40 @@ namespace SocialNetwork.Models.Repositories
             var userChatPairs = from _user in _dbContext.Users
                                 join fact in _dbContext.MembershipInChats on userId equals fact.UserId
                                 join _chat in _dbContext.Chats on fact.ChatId equals _chat.Id
-                                select 1;
-            if (!userChatPairs.Any()) throw new ChatException("Пользователь не состоит в данном чате");
+                                select fact;
+            var userChatPair = userChatPairs.FirstOrDefault();
+            if (userChatPair == null) throw new ChatException("Пользователь не состоит в данном чате");
 
-            chat.Users.Remove(user);
+            _dbContext.MembershipInChats.Remove(userChatPair);
+
+            return chat;
+        }
+
+        public List<ChatMessageViewModel> GetChatMessages(int chatId, string userId)
+        {
+            GroupChat chat = _dbContext.Chats.FirstOrDefault(dbChat => dbChat.Id == chatId);
+            if (chat == null) throw new ChatException("Чат не существует");
+            NetworkUser user = _dbContext.Users.FirstOrDefault(dbUser => dbUser.Id == userId);
+            if (user == null) throw new NetworkUserException("Пользователь не существует");
+
+            var membershipInChat = from _user in _dbContext.Users
+                                join fact in _dbContext.MembershipInChats on userId equals fact.UserId
+                                join _chat in _dbContext.Chats on fact.ChatId equals _chat.Id
+                                select 1;
+            if (!membershipInChat.Any()) throw new ChatException("Пользователь не состоит в данном чате");
+
+
+            IQueryable<ChatMessageViewModel> messages = from _message in _dbContext.Messages
+                                                        where _message.GroupChatId == chatId
+                                                        join _user in _dbContext.Users on _message.SenderId equals _user.Id
+                                                        select new ChatMessageViewModel()
+                                                        {
+                                                            SenderId = _message.SenderId,
+                                                            SenderName = _user.UserName,
+                                                            Text = _message.Text,
+                                                            DateTime = _message.DateTime.ToString("f"),
+                                                        };
+            return messages.ToList();
         }
     }
 }

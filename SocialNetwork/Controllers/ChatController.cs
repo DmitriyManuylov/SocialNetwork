@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using SocialNetwork.Models;
 using SocialNetwork.Models.Exceptions;
 using SocialNetwork.Models.Repositories;
-using SocialNetwork.Models.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +11,8 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO.Pipelines;
 using SocialNetwork.Hubs;
+using SocialNetwork.Models.ViewModels.LiteChatViewModels;
+using SocialNetwork.Models.LiteChatModels;
 
 namespace SocialNetwork.Controllers
 {

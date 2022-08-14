@@ -1,4 +1,5 @@
-﻿using SocialNetwork.Models.ViewModels;
+﻿using SocialNetwork.Models.LiteChatModels;
+using SocialNetwork.Models.ViewModels.LiteChatViewModels;
 using System.Collections.Generic;
 
 namespace SocialNetwork.Models.Repositories

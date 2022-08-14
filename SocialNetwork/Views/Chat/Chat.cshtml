@@ -3,9 +3,11 @@
     ViewData["Title"] = "Chat";
 }
 @section Styles {
-    <link rel="stylesheet" href="~/css/ChatStyles.css" />
+    <link rel="stylesheet" href="~/css/LiteChatStyles.css" />
+    <link rel="stylesheet" href="/css/GeneralChatStyles.css" />
     <link rel="stylesheet" href="/css/MessageStyle.css" />
     <link rel="stylesheet" href="/css/RoomsStyles.css" />
+    <link rel="stylesheet" href="/css/ListItemsStyles.css" />
 }
 <div id="chatBlock">
     <h2 id="chatHeader" class="text-center">Простой чат без регистрации</h2>
@@ -43,4 +45,5 @@
 </dialog>
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
 <script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
-<script src="/js/LiteChat.js"></script>
+<script type="module" src="/js/LiteChat.js"></script>
+

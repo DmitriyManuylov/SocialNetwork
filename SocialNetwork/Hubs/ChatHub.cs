@@ -5,7 +5,7 @@ namespace SocialNetwork.Hubs
 {
     public class ChatHub : Hub
     {
-
+        
         public async Task Send(string sender, string message)
         {
             await Clients.All.SendAsync("Recieve", sender, message);

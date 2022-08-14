@@ -150,65 +150,7 @@ namespace SocialNetwork.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CountryId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CountryId");
-
-                    b.ToTable("Cities");
-                });
-
-            modelBuilder.Entity("SocialNetwork.Models.Country", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Countries");
-                });
-
-            modelBuilder.Entity("SocialNetwork.Models.FriendshipFact", b =>
-                {
-                    b.Property<string>("InitiatorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("InvitedId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("DateOfConclusion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("RequestAccepted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("InitiatorId", "InvitedId");
-
-                    b.HasIndex("InvitedId");
-
-                    b.ToTable("FriendshipFacts");
-                });
-
-            modelBuilder.Entity("SocialNetwork.Models.GroupChat", b =>
+            modelBuilder.Entity("SocialNetwork.Models.ChatModels.GroupChat", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -221,43 +163,59 @@ namespace SocialNetwork.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Chats");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Пинатели мяча в Ростове-на-Дону"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Швырятели мяча в Саратове"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Пинатели мяча руками в Сочи"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Любители погонять в CS \"Стрельцы\""
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Клуб любителей World of Tanks - \"Не пробил\""
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "Собаководы Москвы"
+                        });
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.LiteChatRoom", b =>
+            modelBuilder.Entity("SocialNetwork.Models.ChatModels.MembershipInChat", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Rooms");
-                });
-
-            modelBuilder.Entity("SocialNetwork.Models.MembershipInChat", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("UserId", "ChatId");
+                    b.HasKey("ChatId", "UserId");
 
-                    b.HasIndex("ChatId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("MembershipInChats");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.Message", b =>
+            modelBuilder.Entity("SocialNetwork.Models.ChatModels.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -287,7 +245,216 @@ namespace SocialNetwork.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.NetworkUser", b =>
+            modelBuilder.Entity("SocialNetwork.Models.LiteChatModels.LiteChatRoom", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.LiteChatModels.SimpleMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SenderName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("SimpleMessages");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.UserInfoModels.City", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("Cities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CountryId = 1,
+                            Name = "Санкт-Петербург"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CountryId = 1,
+                            Name = "Москва"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CountryId = 1,
+                            Name = "Ростов-на-Дону"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CountryId = 1,
+                            Name = "Сочи"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CountryId = 1,
+                            Name = "Саратов"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CountryId = 1,
+                            Name = "Иркутск"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CountryId = 2,
+                            Name = "Минск"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CountryId = 2,
+                            Name = "Гомель"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CountryId = 3,
+                            Name = "Берлин"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CountryId = 3,
+                            Name = "Мюнхен"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            CountryId = 4,
+                            Name = "Пекин"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            CountryId = 4,
+                            Name = "Ухань"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            CountryId = 5,
+                            Name = "Париж"
+                        });
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.UserInfoModels.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Россия"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Белоруссия"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Германия"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Китай"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Франция"
+                        });
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.UserInfoModels.FriendshipFact", b =>
+                {
+                    b.Property<string>("InitiatorId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("InvitedId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("DateOfConclusion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("RequestAccepted")
+                        .HasColumnType("bit");
+
+                    b.HasKey("InitiatorId", "InvitedId");
+
+                    b.HasIndex("InvitedId");
+
+                    b.ToTable("FriendshipFacts");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.UserInfoModels.NetworkUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -376,34 +543,6 @@ namespace SocialNetwork.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.SimpleMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SenderName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("SimpleMessages");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -415,7 +554,7 @@ namespace SocialNetwork.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("SocialNetwork.Models.NetworkUser", null)
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -424,7 +563,7 @@ namespace SocialNetwork.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("SocialNetwork.Models.NetworkUser", null)
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -439,7 +578,7 @@ namespace SocialNetwork.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SocialNetwork.Models.NetworkUser", null)
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -448,52 +587,22 @@ namespace SocialNetwork.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("SocialNetwork.Models.NetworkUser", null)
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.City", b =>
+            modelBuilder.Entity("SocialNetwork.Models.ChatModels.MembershipInChat", b =>
                 {
-                    b.HasOne("SocialNetwork.Models.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("SocialNetwork.Models.FriendshipFact", b =>
-                {
-                    b.HasOne("SocialNetwork.Models.NetworkUser", "Initiator")
-                        .WithMany("FriendshipFactsIn")
-                        .HasForeignKey("InitiatorId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("SocialNetwork.Models.NetworkUser", "Invited")
-                        .WithMany("FriendshipFactsOut")
-                        .HasForeignKey("InvitedId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("Initiator");
-
-                    b.Navigation("Invited");
-                });
-
-            modelBuilder.Entity("SocialNetwork.Models.MembershipInChat", b =>
-                {
-                    b.HasOne("SocialNetwork.Models.GroupChat", "Chat")
+                    b.HasOne("SocialNetwork.Models.ChatModels.GroupChat", "Chat")
                         .WithMany("MembershipInChats")
                         .HasForeignKey("ChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SocialNetwork.Models.NetworkUser", "User")
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", "User")
                         .WithMany("MembershipInChats")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -504,15 +613,15 @@ namespace SocialNetwork.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.Message", b =>
+            modelBuilder.Entity("SocialNetwork.Models.ChatModels.Message", b =>
                 {
-                    b.HasOne("SocialNetwork.Models.GroupChat", "Chat")
+                    b.HasOne("SocialNetwork.Models.ChatModels.GroupChat", "Chat")
                         .WithMany("Messages")
                         .HasForeignKey("GroupChatId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SocialNetwork.Models.NetworkUser", "Sender")
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -523,24 +632,9 @@ namespace SocialNetwork.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.NetworkUser", b =>
+            modelBuilder.Entity("SocialNetwork.Models.LiteChatModels.SimpleMessage", b =>
                 {
-                    b.HasOne("SocialNetwork.Models.City", "City")
-                        .WithMany()
-                        .HasForeignKey("CityId");
-
-                    b.HasOne("SocialNetwork.Models.Country", "Country")
-                        .WithMany()
-                        .HasForeignKey("CountryId");
-
-                    b.Navigation("City");
-
-                    b.Navigation("Country");
-                });
-
-            modelBuilder.Entity("SocialNetwork.Models.SimpleMessage", b =>
-                {
-                    b.HasOne("SocialNetwork.Models.LiteChatRoom", "Room")
+                    b.HasOne("SocialNetwork.Models.LiteChatModels.LiteChatRoom", "Room")
                         .WithMany("Messages")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -549,19 +643,64 @@ namespace SocialNetwork.Migrations
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.GroupChat", b =>
+            modelBuilder.Entity("SocialNetwork.Models.UserInfoModels.City", b =>
+                {
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.UserInfoModels.FriendshipFact", b =>
+                {
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", "Initiator")
+                        .WithMany("FriendshipFactsOut")
+                        .HasForeignKey("InitiatorId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", "Invited")
+                        .WithMany("FriendshipFactsIn")
+                        .HasForeignKey("InvitedId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("Initiator");
+
+                    b.Navigation("Invited");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.UserInfoModels.NetworkUser", b =>
+                {
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId");
+
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.Country", "Country")
+                        .WithMany()
+                        .HasForeignKey("CountryId");
+
+                    b.Navigation("City");
+
+                    b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("SocialNetwork.Models.ChatModels.GroupChat", b =>
                 {
                     b.Navigation("MembershipInChats");
 
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.LiteChatRoom", b =>
+            modelBuilder.Entity("SocialNetwork.Models.LiteChatModels.LiteChatRoom", b =>
                 {
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("SocialNetwork.Models.NetworkUser", b =>
+            modelBuilder.Entity("SocialNetwork.Models.UserInfoModels.NetworkUser", b =>
                 {
                     b.Navigation("FriendshipFactsIn");
 

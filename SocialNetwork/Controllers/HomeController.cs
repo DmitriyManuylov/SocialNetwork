@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 using SocialNetwork.Hubs;
+using SocialNetwork.Models.ViewModels;
 
 namespace SocialNetwork.Controllers
 {

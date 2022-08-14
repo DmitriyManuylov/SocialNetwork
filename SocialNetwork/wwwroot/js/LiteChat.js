@@ -1,4 +1,7 @@
-﻿var roomsList = document.getElementById("roomsList");
+﻿
+import { CreateMessageItem, AddRoomToList } from "./HtmlGeneration.js";
+
+var roomsList = document.getElementById("roomsList");
 var userNameDialog = document.getElementById("userNameDialog");
 var senderNameElement = userNameDialog.children[1];
 var butSenderName = userNameDialog.children[2];
@@ -13,46 +16,40 @@ var currentRoom;
 var rooms;
 var currentRoomMessages;
 var userName;
-function AddRoomToList(room) {
-    var divWrap = document.createElement("div");
-    divWrap.classList.add("w-100");
 
-    var button = document.createElement("button");
-    button.innerText = room.name;
-    button.classList.add("w-100","room-item");
-    button.setAttribute("name", "roomId");
-    button.setAttribute("value", room.id);
-    divWrap.appendChild(button);
+var hubConnection = new signalR.HubConnectionBuilder().withUrl("/chat").withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol()).build();
 
-    var hidden = document.createElement("input");
-    hidden.setAttribute("type", "hidden");
-    hidden.setAttribute("value", room.id);
-
-    divWrap.appendChild(hidden);
-    roomsList.appendChild(divWrap);
-    button.addEventListener("click", onRoomSelect);
+hubConnection.on("Recieve", function (simpleMessage) {
+    CreateMessageItem(simpleMessage.Id, simpleMessage.Sender, simpleMessage.Text, simpleMessage.DateTime);
+});
+hubConnection.on("LiteChatRoomCreated", onLiteChatRoomCreated);
+function onLiteChatRoomCreated(room) {
+    var rroom = {
+        id: room.Id,
+        name: room.Name
+    }
+    rooms.push(room);
+    AddRoomToList(rroom, onRoomSelect);
 }
+
+window.onclose = () => { hubConnection.stop(); };
+hubConnection.onreconnected(console.log("реконнект"));
+hubConnection.onclose(console.log("Отрубилось подключение"));
+hubConnection.start();
 
 function InitialSelectRoom() {
     if (roomsList.children.length > 0) {
         currentRoom = roomsList.children[0].children[0];
         currentRoom.click();
-        //currentRoom.dispatchEvent(new Event("click"));
     }
 }
 
 function FillRoomsList(rooms) {
-    rooms.forEach(AddRoomToList);
+    rooms.forEach(room => AddRoomToList(room, onRoomSelect));
 }
 
-//var rooms;
-//var currentRoom;
-//var currentRoomId;
-//var currentRoomElement;
-
-//var list = formRooms.roomsList;
-//list.addEventListener("change", onRoomSelect);
 window.addEventListener("load", init);
+
 function init(e) {
     var request = new XMLHttpRequest();
     request.open("GET", "/Chat/Index");
@@ -71,9 +68,9 @@ function init(e) {
 }
 
 function onRoomSelect(e) {
-    currentRoom.classList.remove("room-item-selected");
+    currentRoom.classList.remove("network-list-item-selected");
     currentRoom = e.target;
-    currentRoom.classList.add("room-item-selected")
+    currentRoom.classList.add("network-list-item-selected")
     var userName = document.getElementById("senderInput").value;
 
 
@@ -99,28 +96,6 @@ function onRoomSelect(e) {
     request.send(formData);
 
 }
-
-
-
-var hubConnection = new signalR.HubConnectionBuilder().withUrl("/chat").withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol()).build();
-
-hubConnection.on("Recieve", function (simpleMessage) {
-    CreateMessageItem(simpleMessage.Id, simpleMessage.Sender, simpleMessage.Text, simpleMessage.DateTime);
-});
-hubConnection.on("LiteChatRoomCreated", onLiteChatRoomCreated);
-function onLiteChatRoomCreated(room) {
-    rroom = {
-        id: room.Id,
-        name: room.Name
-    }
-    rooms.push(room);
-    AddRoomToList(rroom);
-}
-
-window.onclose = () => { hubConnection.stop(); };
-hubConnection.onreconnected(console.log("реконнект"));
-hubConnection.onclose(console.log("Отрубилось подключение"));
-hubConnection.start().then(() => console.log("Подключение выполнено, Id = " + hubConnection.connectionId));
 
 
 function ShowCreateRoomDialog(e) {
@@ -187,33 +162,3 @@ butSenderName.addEventListener("click", () => {
 textArea.addEventListener("keypress", onButSendMessage);
 
 
-function CreateMessageItem(messageId, senderName, messageText, dateTime) {
-    var messageItemDiv = document.createElement("div");
-    messageItemDiv.setAttribute("id", "message" + messageId)
-    messageItemDiv.classList.add("message-box");
-
-
-    var metaDiv = document.createElement("div");
-    metaDiv.classList.add("message-box-header");
-
-
-    var nameElement = document.createElement("div");
-    nameElement.textContent = senderName;
-
-
-    var date = document.createElement("div");
-    date.textContent = dateTime;
-
-    var messageTextNode = document.createElement("div");
-    messageTextNode.classList.add("message-box-item");
-    messageTextNode.innerText = messageText;
-    metaDiv.appendChild(nameElement);
-    metaDiv.appendChild(date);
-
-    var messagesArea = document.getElementById("messagesArea");
-    messageItemDiv.appendChild(metaDiv);
-    messageItemDiv.appendChild(messageTextNode);
-
-    messagesArea.appendChild(messageItemDiv);
-    messagesArea.parentElement.scrollTop = messagesArea.parentElement.scrollHeight;
-}

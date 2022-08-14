@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Models.Exceptions;
+using SocialNetwork.Models.UserInfoModels;
+using SocialNetwork.Models.ViewModels.SocialNetworkViewModels;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SocialNetwork.Models.Repositories
@@ -22,7 +25,11 @@ namespace SocialNetwork.Models.Repositories
 
         public IQueryable<Country> Countries => _dbContext.Countries;
 
-
+        public List<UserViewModel> UsersViewModel => _dbContext.Users.Select(user => new UserViewModel
+        {
+            Id = user.Id,
+            UserName = user.UserName,
+        }).ToList();
 
         public NetworkUser GetUserById(string Id)
         {
@@ -31,7 +38,6 @@ namespace SocialNetwork.Models.Repositories
 
         public void SetUserBirthDate(DateTime birthDate, string userId)
         {
-            var fdgs = _dbContext.Rooms.ToList();
             NetworkUser user = GetUserById(userId);
             if (user == null) throw new NetworkUserException("Пользователь не существует");
             if (birthDate > DateTime.Now) throw new NetworkUserException("Введена недопустимая дата рождения! Данный гражданин из будущего!");
@@ -40,7 +46,7 @@ namespace SocialNetwork.Models.Repositories
             user.SetAge();
         }
 
-        public IQueryable<NetworkUser> FilterUsers(UsersFilter usersFilter)
+        public List<NetworkUser> FilterUsers(UsersFilter usersFilter)
         {
             IQueryable<NetworkUser> users = _dbContext.Users;
             if (usersFilter.CityId.HasValue) users.Where(user => user.CityId.Value == usersFilter.CityId.Value);
@@ -67,9 +73,7 @@ namespace SocialNetwork.Models.Repositories
                 users.Where(user => user.Age < usersFilter.EndAge);
             }
 
-            users.Load();
-
-            return users;
+            return users.ToList();
 
         }
 
@@ -119,8 +123,12 @@ namespace SocialNetwork.Models.Repositories
         /// <exception cref="FriendshipException"></exception>
         public void InviteFriend(string invitorId, string invitedId)
         {
-            NetworkUser invitor = _dbContext.Users.FirstOrDefault(dbUser => dbUser.Id == invitorId);
-            NetworkUser invited = _dbContext.Users.FirstOrDefault(dbUser => dbUser.Id == invitedId);
+            NetworkUser invitor = _dbContext.Users.Include(user => user.FriendshipFactsOut)
+                                                  .Include(user => user.FriendshipFactsIn)
+                                                  .FirstOrDefault(dbUser => dbUser.Id == invitorId);
+            NetworkUser invited = _dbContext.Users.Include(user => user.FriendshipFactsOut)
+                                                  .Include(user => user.FriendshipFactsIn)
+                                                  .FirstOrDefault(dbUser => dbUser.Id == invitedId);
             if (invitor == null) throw new FriendshipException("Приглашающий не существует");
             if (invited == null) throw new FriendshipException("Приглашаемый не существует");
             FriendshipFact friendshipFactOut = invitor.FriendshipFactsOut.FirstOrDefault(fact => fact.InitiatorId == invitorId && fact.InvitedId == invitedId);
@@ -133,9 +141,8 @@ namespace SocialNetwork.Models.Repositories
                 Invited = invited,
                 InvitedId = invitedId,
                 RequestAccepted = false,
-                DateOfConclusion = DateTime.UtcNow,
             };
-            invitor.FriendshipFactsOut.Add(friendshipFact);
+            _dbContext.FriendshipFacts.Add(friendshipFact);
             _dbContext.SaveChanges();
         }
         /// <summary>
@@ -146,16 +153,56 @@ namespace SocialNetwork.Models.Repositories
         /// <exception cref="FriendshipException"></exception>
         public void AcceptFriendship(string invitorId, string invitedId)
         {
-            NetworkUser invitor = _dbContext.Users.FirstOrDefault(dbUser => dbUser.Id == invitorId);
-            NetworkUser invited = _dbContext.Users.FirstOrDefault(dbUser => dbUser.Id == invitedId);
+            NetworkUser invitor = _dbContext.Users.Include(user => user.FriendshipFactsOut)
+                                                  .Include(user => user.FriendshipFactsIn)
+                                                  .FirstOrDefault(dbUser => dbUser.Id == invitorId);
+            NetworkUser invited = _dbContext.Users.Include(user => user.FriendshipFactsOut)
+                                                  .Include(user => user.FriendshipFactsIn)
+                                                  .FirstOrDefault(dbUser => dbUser.Id == invitedId);
             if (invitor == null) throw new FriendshipException("Приглашающий не существует");
             if (invited == null) throw new FriendshipException("Приглашаемый не существует");
 
-            FriendshipFact friendshipFactIn = invitor.FriendshipFactsOut.FirstOrDefault(fact => fact.InitiatorId == invitedId && fact.InvitedId == invitorId);
+            FriendshipFact friendshipFactIn = invited.FriendshipFactsIn.FirstOrDefault(fact => fact.InitiatorId == invitorId && fact.InvitedId == invitedId);
             if (friendshipFactIn == null) throw new FriendshipException("Приглашение дружить не поступало");
             if (friendshipFactIn.RequestAccepted) throw new FriendshipException("Приглашение о дружбе уже было принято");
+            friendshipFactIn.DateOfConclusion = DateTime.UtcNow;
             friendshipFactIn.RequestAccepted = true;
             _dbContext.SaveChanges();
+        }
+
+        public List<UserViewModel> GetFriends(string userId)
+        {
+            IQueryable<UserViewModel> friendsIn = from user in _dbContext.Users
+                                                  join ff in _dbContext.FriendshipFacts on user.Id equals ff.InitiatorId
+                                                  where ff.InvitedId == userId && ff.RequestAccepted == true
+                                                  select new UserViewModel { Id = user.Id, UserName = user.UserName };
+            IQueryable<UserViewModel> friendsOut = from user in _dbContext.Users
+                                                  join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
+                                                  where ff.InitiatorId == userId && ff.RequestAccepted == true
+                                                  select new UserViewModel { Id = user.Id, UserName = user.UserName };
+            List<UserViewModel> friendsList = friendsIn.ToList();
+            List<UserViewModel> friendsOutList = friendsOut.ToList();
+
+            friendsList.AddRange(friendsOutList);
+            return friendsList;
+        }
+
+        public List<UserViewModel> GetIncomingFriendshipInvitations(string userId)
+        {
+            IQueryable<UserViewModel> friendsIn = from user in _dbContext.Users
+                                                  join ff in _dbContext.FriendshipFacts on user.Id equals ff.InitiatorId
+                                                  where ff.InvitedId == userId && ff.RequestAccepted == false
+                                                  select new UserViewModel { Id = user.Id, UserName = user.UserName };
+            return friendsIn.ToList();
+        }
+
+        public List<UserViewModel> GetOutgoingFriendshipInvitations(string userId)
+        {
+            IQueryable<UserViewModel> friendsOut = from user in _dbContext.Users
+                                                   join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
+                                                   where ff.InitiatorId == userId && ff.RequestAccepted == false
+                                                   select new UserViewModel { Id = user.Id, UserName = user.UserName };
+            return friendsOut.ToList();
         }
     }
 }

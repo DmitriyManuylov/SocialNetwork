@@ -5,14 +5,29 @@
     Layout = "_MainLayout";
 }
 @section Styles {
-
+    <link rel="stylesheet" href="/css/GeneralChatStyles.css" />
+    <link rel="stylesheet" href="/css/SocialNetworkStyles.css" />
+    <link rel="stylesheet" href="/css/ListItemsStyles.css" />
 }
-<div id="chatBlock">
-    <div id="liteChat">
-        <div id="roomsWrap" class="flex-item side-bar">
-            <div id="roomsHeader" class="border-bottom-double">
-                <h3>Товарищи</h3>
+<div id="socialNetworkBlock">
+        <div id="leftSide"  class="flex-item side-bar">
+            <div id="comrades">
+                <h5 class="border-bottom-list-header">Товарищи</h5>
+                <div id="comradesAreaWrap">
+                    <div id="comradesArea">
+                        
+                    </div>
+                </div>
             </div>
+            <div id="collectives">
+                <h5 class="border-bottom-list-header">Коллективы товарищей</h5>
+                <div id="collectivesAreaWrap">
+                    <div id="collectivesArea">
+
+                    </div>
+                </div>
+            </div>
+
             <div id="roomsListWrap" class="">
                 <div id="roomsList">
 
@@ -24,9 +39,6 @@
         <div id="rightSide" class="flex-item side-bar">
 
         </div>
-    </div>
-</div>
 
-<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
-<script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
-<script src="/js/LiteChat.js"></script>
+</div>
+<script type="module" src="~/ts/SocialNetwork.js"></script>

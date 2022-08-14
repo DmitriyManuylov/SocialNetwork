@@ -3,11 +3,26 @@
     margin: 0;
 }
 
+:root {
+    --footer-height: 135px;
+    --header-height: 75px;
+    --header-height-login: 40px;
+}
 
 body {
     height: 100vh;
     background-color: #dee2e3;
     overflow: auto;
+}
+
+.flex-container {
+    display: flex;
+}
+
+#networkBody {
+    width: 100%;
+    height: 100%;
+    padding-top: var(--header-height);
 }
 
 #networkHeader {

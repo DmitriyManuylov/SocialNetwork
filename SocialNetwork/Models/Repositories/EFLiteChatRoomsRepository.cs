@@ -1,9 +1,10 @@
 ﻿using SocialNetwork.Models.Exceptions;
-using SocialNetwork.Models.ViewModels;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System;
+using SocialNetwork.Models.ViewModels.LiteChatViewModels;
+using SocialNetwork.Models.LiteChatModels;
 
 namespace SocialNetwork.Models.Repositories
 {

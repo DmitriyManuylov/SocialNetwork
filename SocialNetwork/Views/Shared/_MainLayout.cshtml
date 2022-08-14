@@ -31,8 +31,19 @@
             }
             else
             {
-                <a asp-action="Register" asp-controller="Account">Зарегистрироваться</a>
-                <a asp-action="Login" asp-controller="Account">Войти</a>
+                if (Context.Request.Path == "/Account/Register")
+                {
+                    <a asp-action="Login" asp-controller="Account">Войти</a>
+                }
+                else if (Context.Request.Path == "/Account/Login")
+                {
+                    <a asp-action="Register" asp-controller="Account">Зарегистрироваться</a>
+                }
+                else
+                {
+                    <a asp-action="Register" asp-controller="Account">Зарегистрироваться</a>
+                    <a asp-action="Login" asp-controller="Account">Войти</a>
+                }
             }
         </div>
     </div>

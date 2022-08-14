@@ -18,6 +18,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using SocialNetwork.Hubs;
+using SocialNetwork.Models.UserInfoModels;
 
 namespace SocialNetwork
 {
@@ -60,8 +61,8 @@ namespace SocialNetwork
             .AddCookie(options =>
             {
                 options.LoginPath = new PathString("/Account/Login");
-                options.LogoutPath = new PathString("/Home/Index");
-                options.AccessDeniedPath = new PathString("/Home/Index");
+                options.LogoutPath = new PathString("/Chat/Chat");
+                options.AccessDeniedPath = new PathString("/Chat/Chat");
             });
             services.AddAuthorization(options =>
             {
@@ -99,31 +100,17 @@ namespace SocialNetwork
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
+                    name: "",
+                    pattern: "User{Id:guid}",
+                    defaults: new { controller = "SocialNetwork", action = "UserPage" });
+
+                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Chat}/{action=Chat}/{id?}");
                 endpoints.MapHub<ChatHub>("/chat");
                 endpoints.MapHub<SocialNetworkHub>("/SocialNetwork");
             });
 
-            //app.Run(async context =>
-            //{
-
-            //    var sb = new StringBuilder();
-            //    sb.Append("<h1>Все сервисы</h1>");
-            //    sb.Append("<table>");
-            //    sb.Append("<tr><th>Тип</th><th>Lifetime</th><th>Реализация</th></tr>");
-            //    foreach (var svc in _services)
-            //    {
-            //        sb.Append("<tr>");
-            //        sb.Append($"<td>{svc.ServiceType.FullName}</td>");
-            //        sb.Append($"<td>{svc.Lifetime}</td>");
-            //        sb.Append($"<td>{svc.ImplementationType?.FullName}</td>");
-            //        sb.Append("</tr>");
-            //    }
-            //    sb.Append("</table>");
-            //    context.Response.ContentType = "text/html;charset=utf-8";
-            //    await context.Response.WriteAsync(sb.ToString());
-            //});
         }
     }
 }
