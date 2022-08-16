@@ -1,6 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model object
 @{
     Layout = "_MainLayout";
 }
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="/css/GeneralChatStyles.css" />
     <link rel="stylesheet" href="/css/SocialNetworkStyles.css" />
     <link rel="stylesheet" href="/css/ListItemsStyles.css" />
+    <link rel="stylesheet" href="/css/MessageStyle.css" />
 }
 <div id="socialNetworkBlock">
         <div id="leftSide"  class="flex-item side-bar">
@@ -41,4 +43,7 @@
         </div>
 
 </div>
-<script type="module" src="~/ts/SocialNetwork.js"></script>
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+<script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
+<script type="module" src="~/js//SocialNetwork.js"></script>

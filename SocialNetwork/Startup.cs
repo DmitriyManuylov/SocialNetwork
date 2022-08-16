@@ -70,7 +70,7 @@ namespace SocialNetwork
             });
 
             services.AddSingleton(_services);
-
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,7 +95,7 @@ namespace SocialNetwork
 
             app.UseAuthorization();
 
-
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
@@ -105,8 +105,18 @@ namespace SocialNetwork
                     defaults: new { controller = "SocialNetwork", action = "UserPage" });
 
                 endpoints.MapControllerRoute(
+                    name: "",
+                    pattern: "{controller}/{action}/{chatId:int}");
+
+                endpoints.MapControllerRoute(
+                    name: "",
+                    pattern: "{controller}/{action}/{interlocutorId:guid}");
+
+                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Chat}/{action=Chat}/{id?}");
+
+
                 endpoints.MapHub<ChatHub>("/chat");
                 endpoints.MapHub<SocialNetworkHub>("/SocialNetwork");
             });

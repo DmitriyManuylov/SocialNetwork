@@ -26,7 +26,7 @@ namespace SocialNetwork.Models.Repositories
         {
             IQueryable<ChatViewModel> chats = from chat in _dbContext.Chats
                                               join mic in _dbContext.MembershipInChats on chat.Id equals mic.ChatId
-                                              where mic.UserId == userId
+                                              where mic.UserId == userId && chat.Name != ""
                                               select new ChatViewModel
                                               {
                                                   Id = chat.Id,
@@ -39,6 +39,46 @@ namespace SocialNetwork.Models.Repositories
         {
             GroupChat chat = _dbContext.Chats.FirstOrDefault(chat => chat.Id == chatId);
             if (chat == null) throw new ChatException("Чат с таким Id не существует");
+            return chat;
+        }
+        public GroupChat GetUsersDialog(string userId, string interlocutorId)
+        {
+            NetworkUser user = _dbContext.Users.FirstOrDefault(user => user.Id == userId);
+            if (user == null) throw new NetworkUserException("Запрашивающий пользователь не существует");
+            NetworkUser interlocutor = _dbContext.Users.FirstOrDefault(user => user.Id == interlocutorId);
+            if (user == null) throw new NetworkUserException("Собеседник пользователя не существует");
+
+            var chat = _dbContext.MembershipInChats.Where(mic => mic.UserId == user.Id)
+                                                        .Join(_dbContext.Chats,
+                                                              mic => mic.ChatId,
+                                                              chat => chat.Id,
+                                                              (mic, chat) => chat)
+                                                        .Join(_dbContext.MembershipInChats,
+                                                              chat => chat.Id,
+                                                              mic => mic.ChatId,
+                                                              (chat, mic) => new { chat, mic.UserId })
+                                                        .Where(a => a.chat.Name == "" && a.UserId == interlocutor.Id).Select(a => a.chat).FirstOrDefault();
+            
+            if (chat == null) chat = CreateUsersDialog(user, interlocutor);
+            return chat;
+        }
+        private GroupChat CreateUsersDialog(NetworkUser user, NetworkUser interlocutor)
+        {
+            GroupChat chat = new GroupChat() { Name = "" };
+            _dbContext.Chats.Add(chat);
+            MembershipInChat mic1 = new MembershipInChat()
+            {
+                Chat = chat,
+                User = user,
+            };
+            MembershipInChat mic2 = new MembershipInChat()
+            {
+                Chat = chat,
+                User = interlocutor
+            };
+            _dbContext.MembershipInChats.AddRange(mic1, mic2);
+            _dbContext.SaveChanges();
+
             return chat;
         }
 
@@ -112,6 +152,23 @@ namespace SocialNetwork.Models.Repositories
             _dbContext.SaveChanges();
             return message;
         }
+
+        public Message SendMessageToChat(string senderId, string text, string interlocutorId)
+        {
+            NetworkUser user = _dbContext.Users.FirstOrDefault(user => user.Id == senderId);
+            if (user == null) throw new NetworkUserException("Запрашивающий пользователь не существует");
+            NetworkUser interlocutor = _dbContext.Users.FirstOrDefault(user => user.Id == interlocutorId);
+            if (user == null) throw new NetworkUserException("Собеседник пользователя не существует");
+            GroupChat chat = GetUsersDialog(user.Id, interlocutor.Id);
+            Message message = new Message() { SenderId = senderId, 
+                                              Chat = chat,
+                                              Text = text, 
+                                              DateTime = System.DateTime.Now };
+            _dbContext.Messages.Add(message);
+            _dbContext.SaveChanges();
+            return message;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -161,6 +218,26 @@ namespace SocialNetwork.Models.Repositories
                                                             Text = _message.Text,
                                                             DateTime = _message.DateTime.ToString("f"),
                                                         };
+            return messages.ToList();
+        }
+
+        public List<ChatMessageViewModel> GetDialogMessages(string userId, string interlocutorId)
+        {
+            NetworkUser user = _dbContext.Users.FirstOrDefault(user => user.Id == userId);
+            if (user == null) throw new NetworkUserException("Запрашивающий пользователь не существует");
+            NetworkUser interlocutor = _dbContext.Users.FirstOrDefault(user => user.Id == interlocutorId);
+            if (user == null) throw new NetworkUserException("Собеседник пользователя не существует");
+            GroupChat chat = GetUsersDialog(userId, interlocutorId);
+            IQueryable<ChatMessageViewModel> messages  = from _message in _dbContext.Messages
+                                                         where _message.GroupChatId == chat.Id
+                                                         join _user in _dbContext.Users on _message.SenderId equals _user.Id
+                                                         select new ChatMessageViewModel()
+                                                         {
+                                                             SenderId = _message.SenderId,
+                                                             SenderName = _user.UserName,
+                                                             Text = _message.Text,
+                                                             DateTime = _message.DateTime.ToString("f"),
+                                                         };
             return messages.ToList();
         }
     }

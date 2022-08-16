@@ -15,8 +15,9 @@
     justify-content: space-between;
 }
     .message-box-header a {
-        text-decoration: none;
         color: #fc7019;
+    }
+    .message-box-header a:hover{
     }
 .message-box-item {
     width: 100%;

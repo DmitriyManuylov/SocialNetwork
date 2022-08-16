@@ -7,12 +7,19 @@
     .network-list-item:hover {
         background-color: silver;
     }
-
-.network-list-item-selected {
-    background-color: darkslategrey;
+    .network-list-item a {
+        color: black;
+    }
+        .network-list-item a:hover {
+            color: white;
+        }
+    .network-list-item-selected {
+        background-color: darkslategrey;
+        color: #fc7019;
+    }
+.network-list-item-selected a {
     color: #fc7019;
 }
-
     .network-list-item-selected:hover {
         background-color: slategray;
     }

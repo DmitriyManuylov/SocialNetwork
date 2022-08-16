@@ -84,7 +84,7 @@ function onRoomSelect(e) {
     formData.append("userName", userName);
     formData.append("connectionId", connectionId);
     request.open("POST", "/Chat/JoinToGroup");
-
+    var origin = location.origin;
     request.onload = (e) => {
         if (request.status == 200) {
             currentRoomMessages = JSON.parse(request.response);
@@ -149,9 +149,9 @@ function SendMessage(message) {
     formData.append("Text", message);
     xhr.onload = () => {
         if (xhr.status == 200)
-            console.log("Пришло!Заебись!");
+            console.log("Сообщение отправлено");
         else
-            console.log("Херня какая-то=(");
+            console.log("Сообщение не отправлено");
     };
     xhr.send(formData);
 }
