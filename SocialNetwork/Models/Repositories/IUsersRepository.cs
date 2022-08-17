@@ -20,8 +20,8 @@ namespace SocialNetwork.Models.Repositories
         NetworkUser GetUserById(string Id);
         void SetCityInUsersInfo(City city, NetworkUser user);
         void SetCountryInUsersInfo(Country country, NetworkUser user);
-        List<UserViewModel> GetFriends(string userId);
-        List<UserViewModel> GetIncomingFriendshipInvitations(string userId);
-        List<UserViewModel> GetOutgoingFriendshipInvitations(string userId);
+        List<InterlocutorViewModel> GetFriends(string userId);
+        List<InterlocutorViewModel> GetIncomingFriendshipInvitations(string userId);
+        List<InterlocutorViewModel> GetOutgoingFriendshipInvitations(string userId);
     }
 }

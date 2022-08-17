@@ -11,6 +11,7 @@ namespace SocialNetwork.Models.Repositories
         List<ChatViewModel> GetUserChats(string userId);
         GroupChat GetChatById(int chatId);
         GroupChat GetUsersDialog(string userId, string interlocutorId);
+        GroupChat EnsureGetUsersDialog(string userId, string interlocutorId);
         GroupChat CreateChat(string chatName, NetworkUser Creator);
         GroupChat JoinToChat(int chatId, string userId);
         Message SendMessageToChat(string senderId, string text, int chatId);

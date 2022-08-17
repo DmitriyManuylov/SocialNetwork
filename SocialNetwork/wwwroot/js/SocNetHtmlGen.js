@@ -4,21 +4,26 @@ export function CreateUserListItem(user, onChatSelected, onMessageSend) {
     var butUser = document.createElement("button");
     var hiddenId = document.createElement("input");
     var userLink = document.createElement("a");
+    var hiddenChatId = document.createElement("input");
 
     butUser.classList.add("w-100", "network-list-item");
     butUser.onclick = e => {
-        onChatSelected(e, "/SocialNetwork/ConnectToDialog/" + user.id, "/SocialNetwork/DisconnectFromDialog/" + user.id);
-        messageTextArea.onkeypress = e => onMessageSend(e, "/SocialNetwork/SendMessageToInterlocutor/" + user.id);
+        onChatSelected(e, "ConnectToDialog", null, user.chatId);
+        messageTextArea.onkeypress = e => onMessageSend(e, "SendMessageToInterlocutor", user.chatId);
     }
-
+    
     hiddenId.type = "hidden";
     hiddenId.value = user.id;
+
+    hiddenChatId.type = "hidden";
+    hiddenChatId.value = user.chatId;
 
     userLink.href = user.userPageLink;
     userLink.innerText = user.userName;
 
     butUser.appendChild(userLink);
     listItemDiv.appendChild(butUser);
+    listItemDiv.appendChild(hiddenChatId);
     listItemDiv.appendChild(hiddenId);
     listItemDiv.classList.add("w-100");
     return listItemDiv;
@@ -33,8 +38,8 @@ export function CreateGroupChatListItem(chat, onChatSelected, onMessageSend) {
     butUser.classList.add("w-100", "network-list-item");
     butUser.innerText = chat.name;
     butUser.onclick = e => {
-        onChatSelected(e, "/SocialNetwork/ConnectToChat/" + chat.id, "/SocialNetwork/DisconnectFromChat/" + chat.id);
-        messageTextArea.onkeypress = e => onMessageSend(e, "/SocialNetwork/SendMessage/" + chat.id);
+        onChatSelected(e, "ConnectToChat", "DisconnectFromChat", chat.id);
+        messageTextArea.onkeypress = e => onMessageSend(e, "SendMessage",chat.id);
     };
 
     hiddenId.type = "hidden";

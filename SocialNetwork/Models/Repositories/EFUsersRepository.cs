@@ -170,38 +170,38 @@ namespace SocialNetwork.Models.Repositories
             _dbContext.SaveChanges();
         }
 
-        public List<UserViewModel> GetFriends(string userId)
+        public List<InterlocutorViewModel> GetFriends(string userId)
         {
-            IQueryable<UserViewModel> friendsIn = from user in _dbContext.Users
+            IQueryable<InterlocutorViewModel> friendsIn = from user in _dbContext.Users
                                                   join ff in _dbContext.FriendshipFacts on user.Id equals ff.InitiatorId
                                                   where ff.InvitedId == userId && ff.RequestAccepted == true
-                                                  select new UserViewModel { Id = user.Id, UserName = user.UserName };
-            IQueryable<UserViewModel> friendsOut = from user in _dbContext.Users
+                                                  select new InterlocutorViewModel { Id = user.Id, UserName = user.UserName };
+            IQueryable<InterlocutorViewModel> friendsOut = from user in _dbContext.Users
                                                   join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
                                                   where ff.InitiatorId == userId && ff.RequestAccepted == true
-                                                  select new UserViewModel { Id = user.Id, UserName = user.UserName };
-            List<UserViewModel> friendsList = friendsIn.ToList();
-            List<UserViewModel> friendsOutList = friendsOut.ToList();
+                                                  select new InterlocutorViewModel { Id = user.Id, UserName = user.UserName };
+            List<InterlocutorViewModel> friendsList = friendsIn.ToList();
+            List<InterlocutorViewModel> friendsOutList = friendsOut.ToList();
 
             friendsList.AddRange(friendsOutList);
             return friendsList;
         }
 
-        public List<UserViewModel> GetIncomingFriendshipInvitations(string userId)
+        public List<InterlocutorViewModel> GetIncomingFriendshipInvitations(string userId)
         {
-            IQueryable<UserViewModel> friendsIn = from user in _dbContext.Users
+            IQueryable<InterlocutorViewModel> friendsIn = from user in _dbContext.Users
                                                   join ff in _dbContext.FriendshipFacts on user.Id equals ff.InitiatorId
                                                   where ff.InvitedId == userId && ff.RequestAccepted == false
-                                                  select new UserViewModel { Id = user.Id, UserName = user.UserName };
+                                                  select new InterlocutorViewModel { Id = user.Id, UserName = user.UserName };
             return friendsIn.ToList();
         }
 
-        public List<UserViewModel> GetOutgoingFriendshipInvitations(string userId)
+        public List<InterlocutorViewModel> GetOutgoingFriendshipInvitations(string userId)
         {
-            IQueryable<UserViewModel> friendsOut = from user in _dbContext.Users
+            IQueryable<InterlocutorViewModel> friendsOut = from user in _dbContext.Users
                                                    join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
                                                    where ff.InitiatorId == userId && ff.RequestAccepted == false
-                                                   select new UserViewModel { Id = user.Id, UserName = user.UserName };
+                                                   select new InterlocutorViewModel { Id = user.Id, UserName = user.UserName };
             return friendsOut.ToList();
         }
     }

@@ -2,6 +2,6 @@
 {
     public class InterlocutorViewModel: UserViewModel
     {
-        public int ChatId { get; set; }
+        public int? ChatId { get; set; }
     }
 }

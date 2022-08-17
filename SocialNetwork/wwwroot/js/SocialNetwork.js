@@ -4,7 +4,10 @@ import {CreateUserListItem, CreateGroupChatListItem, CreateMessageItem } from ".
 var access_token;
 var hubConnection = new signalR.HubConnectionBuilder().withUrl("/SocialNetwork").withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol()).build();
 hubConnection.on("MessageRecieved", function (message) {
+    var ChatId = message.ChatId;
+    if (ChatId != currentChatId) return;
     var mess = {
+        chatId: message.ChatId,
         senderId: message.SenderId,
         senderName: message.SenderName,
         senderLink: message.SenderLink,
@@ -42,7 +45,19 @@ var messageInput = document.querySelector("#messageInput");
 
 var messageTextArea = messageInput.firstElementChild;
 
-async function onMessageSend(e, action) {
+async function GetDialogId(userId) {
+    if (!userId) return;
+    var url = location.origin + "/SocialNetwork/GetDialogId/" + userId;
+    var response = await fetch(url, {
+        method: "GET"
+    });
+    var chatId;
+    if (response.ok)
+        chatId = await response.json();
+    return chatId;
+}
+
+async function onMessageSend(e, action, chatId) {
     if (e.keyCode != 13) return;
     if (e.shiftKey) return;
     e.preventDefault();
@@ -50,11 +65,15 @@ async function onMessageSend(e, action) {
     if (message == null || message == "") return;
     if (!currentChatId) return;
 
+    var controller = "/SocialNetwork/";
     messageTextArea.value = "";
     var formData = new FormData();
-/*    formData.append("chatId", currentChatId)*/
+    /*    formData.append("chatId", currentChatId)*/
     formData.append("text", message);
-    var url = location.origin + action;
+    var url = location.origin + controller + action + "/" + chatId;
+    if (action == "SendMessageToInterlocutor") {
+        formData.append("interlocutorId", currentChatbut.parentElement.children[2].value);
+    }
     var response = await fetch(url, {
         method: "POST",
         body: formData
@@ -66,21 +85,35 @@ async function onMessageSend(e, action) {
 }
 
 
-async function onChatSelected(e, actionConnect, actionDisconnect) {
+async function onChatSelected(e, actionConnect, actionDisconnect, chatId) {
     messagesArea.innerHTML = "";
     var queryString = "?" + "connectionId=" + hubConnection.connectionId;
-    var urlConnect = location.origin + actionConnect;
-    var urlDisconnect = location.origin + actionDisconnect;
+    var controller = "/SocialNetwork/";
+    
+    var targetChatBut = e.target;
+    var hiddenChatId = targetChatBut.nextSibling;
+    var hiddenUserId = hiddenChatId.nextSibling;
+    if (hiddenUserId) {
+        var userId = hiddenUserId.value;
+        if (!chatId) {
+            chatId = await GetDialogId(userId);
+        }
+    }
+    var urlConnect = location.origin + controller + actionConnect + "/" + chatId;
     if (currentChatbut) {
         currentChatbut.classList.remove("network-list-item-selected");
-        await fetch(urlDisconnect + queryString, {
-            method: "GET"
-        });
+        if (actionDisconnect) {
+            var urlDisconnect = location.origin + controller + actionDisconnect + "/" + chatId;
+            await fetch(urlDisconnect + queryString, {
+                method: "GET"
+            });
+
+        };
     }
-    currentChatbut = e.target;
+    currentChatbut = targetChatBut;
     currentChatbut.classList.add("network-list-item-selected");
-    var hiddenChatId = currentChatbut.nextSibling;
-    currentChatId = hiddenChatId.value;
+
+    currentChatId = chatId;
 
     var response = await fetch(urlConnect + queryString, {
         method: "GET"

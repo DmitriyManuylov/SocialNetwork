@@ -36,9 +36,7 @@ namespace SocialNetwork.Controllers
         }
         public IActionResult Index()
         {
-            string userId = _userManager.GetUserId(User);
-            object obj = new { userId };
-            return View(model: userId);
+            return View();
         }
 
         public IActionResult Data()
@@ -52,11 +50,20 @@ namespace SocialNetwork.Controllers
                 OutgoingFriendshipInvitations = _usersRepository.GetOutgoingFriendshipInvitations(userId),
             };
             foreach (var item in model.Friends)
+            {
                 item.UserPageLink = $"/User{item.Id}";
+                item.ChatId = _socialNetworkRepository.GetUsersDialog(userId, item.Id)?.Id;
+            }
             foreach (var item in model.IncomingFriendshipInvitations)
+            {
                 item.UserPageLink = $"/User{item.Id}";
+                item.ChatId = _socialNetworkRepository.GetUsersDialog(userId, item.Id)?.Id;
+            }
             foreach (var item in model.OutgoingFriendshipInvitations)
+            {
                 item.UserPageLink = $"/User{item.Id}";
+                item.ChatId = _socialNetworkRepository.GetUsersDialog(userId, item.Id)?.Id;
+            }
             return Ok(model);
         }
 
@@ -159,20 +166,26 @@ namespace SocialNetwork.Controllers
             List<ChatMessageViewModel> messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
             HttpContext.Session.SetString("CurrentChatName", chat.Name);
             foreach (ChatMessageViewModel message in messages)
+            {
                 message.SenderLink = "/User" + message.SenderId;
+                message.ChatId = chatId;
+            }
             await _hubContext.Groups.AddToGroupAsync(connectionId, chat.Name);
             return Ok(messages);
         }
-        public async Task<IActionResult> ConnectToDialog(string interlocutorId, string connectionId)
+        public IActionResult ConnectToDialog(int chatId, string interlocutorId)
         {
             string userId = _userManager.GetUserId(User);
-            GroupChat chat = _socialNetworkRepository.GetUsersDialog(userId, interlocutorId);
-            List<ChatMessageViewModel> messages = _socialNetworkRepository.GetDialogMessages(userId, interlocutorId);
-            HttpContext.Session.SetString("CurrentChatName", chat.Name);
-            await _hubContext.Groups.AddToGroupAsync(connectionId, userId + interlocutorId);
-            await _hubContext.Groups.AddToGroupAsync(connectionId, interlocutorId + userId);
+            
+            GroupChat chat = _socialNetworkRepository.GetChatById(chatId);
+            if (!string.IsNullOrEmpty(chat.Name)) return BadRequest();
+            List<ChatMessageViewModel> messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
+
             foreach (ChatMessageViewModel message in messages)
+            {
                 message.SenderLink = "/User" + message.SenderId;
+                message.ChatId = chatId;
+            }
             return Ok(messages);
         }
         public async Task<IActionResult> DisconnectFromChat(int chatId, string connectionId)
@@ -180,14 +193,6 @@ namespace SocialNetwork.Controllers
             string userId = _userManager.GetUserId(User);
             GroupChat chat = _socialNetworkRepository.GetChatById(chatId);
             await _hubContext.Groups.RemoveFromGroupAsync(connectionId, chat.Name);
-            HttpContext.Session.Remove("CurrentChatName");
-            return Ok();
-        }
-        public async Task<IActionResult> DisconnectFromDialog(string interlocutorId, string connectionId)
-        {
-            string userId = _userManager.GetUserId(User);
-            await _hubContext.Groups.RemoveFromGroupAsync(connectionId, userId + interlocutorId);
-            await _hubContext.Groups.RemoveFromGroupAsync(connectionId, interlocutorId + userId);
             HttpContext.Session.Remove("CurrentChatName");
             return Ok();
         }
@@ -215,20 +220,30 @@ namespace SocialNetwork.Controllers
             return Ok();
         }
 
-        public async Task<IActionResult> SendMessageToInterlocutor(string interlocutorId, string text)
+        public IActionResult GetDialogId(string interlocutorId)
+        {
+            string userId = _userManager.GetUserId(User);
+            GroupChat chat = _socialNetworkRepository.EnsureGetUsersDialog(userId, interlocutorId);
+            object obj = new { chatId = chat.Id };
+            return Ok(chat.Id);
+        }
+        public async Task<IActionResult> SendMessageToInterlocutor(int chatId, string text, string interlocutorId)
         {
             string userId = _userManager.GetUserId(User);
             NetworkUser thisUser = await _userManager.GetUserAsync(User);
-            Message message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(thisUser.Id, text, interlocutorId));
+            GroupChat chat = _socialNetworkRepository.GetChatById(chatId);
+            Message message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(userId, text, chatId));
             ChatMessageViewModel viewModel = new ChatMessageViewModel()
             {
+                ChatId = chatId,
                 SenderId = userId,
                 SenderName = thisUser.UserName,
                 Text = text,
                 DateTime = message.DateTime.ToString("f"),
                 SenderLink = $"/User{userId}"
             };
-            await _hubContext.Clients.Group(userId + interlocutorId).MessageRecieved(viewModel);
+            await _hubContext.Clients.User(interlocutorId).MessageRecieved(viewModel);
+            await _hubContext.Clients.User(userId).MessageRecieved(viewModel);
             return Ok();
         }
     }
