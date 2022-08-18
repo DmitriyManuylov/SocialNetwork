@@ -86,6 +86,7 @@ namespace SocialNetwork.Models.Repositories
             messages = _dbContext.SimpleMessages.Where(message => message.RoomId == roomId).Select(message => new OutSimpleMessageViewModel()
             {
                 Id = message.Id,
+                RoomId = room.Id,
                 Sender = message.SenderName,
                 Text = message.Text,
                 DateTime = message.DateTime.ToString("f")

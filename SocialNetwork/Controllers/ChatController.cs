@@ -64,21 +64,30 @@ namespace SocialNetwork.Controllers
         {
             LiteChatRoom chatRoom = _chatRoomsRepository.GetLiteChatRoomById(roomId);
             await _hubContext.Groups.AddToGroupAsync(connectionId, chatRoom.Name);
-            await _hubContext.Clients.Group(chatRoom.Name).SendAsync("GroupNotify", $"Пользователь {userName} присоединился к чату");
+            await _hubContext.Clients.GroupExcept(chatRoom.Name, connectionId).SendAsync("GroupNotify", $"Пользователь {userName} присоединился к чату", roomId, DateTime.Now.ToString("f"));
             List<OutSimpleMessageViewModel> messages = _chatRoomsRepository.GetLiteChatMessagesToView(roomId);
+            messages.Add(new OutSimpleMessageViewModel()
+            {
+                Sender = "System",
+                RoomId = roomId,
+                Text = $"Вы присоединились к чату \"{chatRoom.Name}\"",
+                DateTime = DateTime.Now.ToString("f")
+            });
             return Json(messages);
         }
 
-        public async Task<IActionResult> ExitFromGroup(LiteChatRoomViewModel room, string userName, string connectionId)
+        public async Task<IActionResult> ExitFromGroup(int roomId, string userName, string connectionId)
         {
-            await _hubContext.Clients.Group(room.Name).SendAsync("GroupNotify", $"Пользователь {userName} покинул чат");
-            await _hubContext.Groups.RemoveFromGroupAsync(connectionId, room.Name);
+            var chatRoom = _chatRoomsRepository.GetLiteChatRoomById(roomId);
+            await _hubContext.Groups.RemoveFromGroupAsync(connectionId, chatRoom.Name);
+            await _hubContext.Clients.Group(chatRoom.Name).SendAsync("GroupNotify", $"Пользователь {userName} покинул чат", roomId, DateTime.Now.ToString("f"));
             return Ok();
         }
 
         [HttpPost]
         public async Task<IActionResult> Send(int roomId, InSimpleMessageViewModel sendingMessage)
         {
+            var chatRoom = _chatRoomsRepository.GetLiteChatRoomById(roomId);
             SimpleMessage message;
             try
             {
@@ -87,8 +96,8 @@ namespace SocialNetwork.Controllers
             {
                 return BadRequest(ex.Message);
             }
-            OutSimpleMessageViewModel messageViewModel= new OutSimpleMessageViewModel() { Id = message.Id, DateTime = message.DateTime.ToString(), Sender = message.SenderName, Text = message.Text };
-            await _hubContext.Clients.All.SendAsync("Recieve", messageViewModel);
+            OutSimpleMessageViewModel messageViewModel= new OutSimpleMessageViewModel() { Id = message.Id, RoomId = roomId, DateTime = message.DateTime.ToString("f"), Sender = message.SenderName, Text = message.Text };
+            await _hubContext.Clients.Group(chatRoom.Name).SendAsync("Recieve", messageViewModel);
             return Ok();
         }
     }

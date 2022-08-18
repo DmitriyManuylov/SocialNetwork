@@ -13,6 +13,7 @@ var textArea = document.getElementById("messageInput").children[0];
 var messagesArea = document.getElementById("messagesArea");
 
 var currentRoom;
+var currentRoomId;
 var rooms;
 var currentRoomMessages;
 var userName;
@@ -20,8 +21,13 @@ var userName;
 var hubConnection = new signalR.HubConnectionBuilder().withUrl("/chat").withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol()).build();
 
 hubConnection.on("Recieve", function (simpleMessage) {
+    //if (simpleMessage.RoomId != currentRoomId) return;
     CreateMessageItem(simpleMessage.Id, simpleMessage.Sender, simpleMessage.Text, simpleMessage.DateTime);
 });
+hubConnection.on("GroupNotify", function (message, chatId, dateTime) {
+   // if (chatId != currentRoomId) return;
+    CreateMessageItem("", "System", message, dateTime)
+})
 hubConnection.on("LiteChatRoomCreated", onLiteChatRoomCreated);
 function onLiteChatRoomCreated(room) {
     var rroom = {
@@ -39,8 +45,10 @@ hubConnection.start();
 
 function InitialSelectRoom() {
     if (roomsList.children.length > 0) {
-        currentRoom = roomsList.children[0].children[0];
-        currentRoom.click();
+        if (userName == "" || userName == undefined) {
+            userNameDialog.showModal();
+        }
+
     }
 }
 
@@ -68,23 +76,41 @@ function init(e) {
 }
 
 function onRoomSelect(e) {
-    currentRoom.classList.remove("network-list-item-selected");
-    currentRoom = e.target;
-    currentRoom.classList.add("network-list-item-selected")
+    //if (userName == "" || userName == undefined) {
+    //    userNameDialog.showModal();
+    //    return;
+    //}
     var userName = document.getElementById("senderInput").value;
+    var connectionId = hubConnection.connectionId;
+    var roomId;
+    if (currentRoom) {
+        roomId = parseInt(currentRoom.nextSibling.value);
+        currentRoom.classList.remove("network-list-item-selected");
+        var exitRequest = new XMLHttpRequest();
+        exitRequest.open("POST", "Chat/ExitFromGroup");
+        let exitFormData = new FormData();
+        exitFormData.append("roomId", roomId);
+        exitFormData.append("userName", userName);
+        exitFormData.append("connectionId", connectionId);
+        exitRequest.send(exitFormData);
+    }
 
+    currentRoom = e.target;
+    currentRoomId = parseInt(currentRoom.nextSibling.value);
+    currentRoom.classList.add("network-list-item-selected")
+    roomId = parseInt(currentRoom.nextSibling.value);
 
     messagesArea.innerHTML = '';
+    
     var request = new XMLHttpRequest();
-    var connectionId = hubConnection.connectionId;
-    var roomId = parseInt(currentRoom.nextSibling.value);
-    var formData = new FormData();
 
-    formData.append("roomId", roomId);
-    formData.append("userName", userName);
-    formData.append("connectionId", connectionId);
+    var joinFormData = new FormData();
+    joinFormData.append("roomId", roomId);
+    joinFormData.append("userName", userName);
+    joinFormData.append("connectionId", connectionId);
     request.open("POST", "/Chat/JoinToGroup");
-    var origin = location.origin;
+
+
     request.onload = (e) => {
         if (request.status == 200) {
             currentRoomMessages = JSON.parse(request.response);
@@ -92,8 +118,8 @@ function onRoomSelect(e) {
             currentRoomMessages.forEach(message =>
                 CreateMessageItem(message.id, message.sender, message.text, message.dateTime));
         }
-    }
-    request.send(formData);
+    };
+    request.send(joinFormData);
 
 }
 
@@ -144,7 +170,7 @@ function SendMessage(message) {
 
 
     var formData = new FormData();
-    formData.append("roomId", parseInt(currentRoom.nextSibling.value));
+    formData.append("roomId", currentRoomId);
     formData.append("Sender", userName);
     formData.append("Text", message);
     xhr.onload = () => {
@@ -158,6 +184,8 @@ function SendMessage(message) {
 butSenderName.addEventListener("click", () => {
     userName = senderNameElement.value;
     userNameDialog.close();
+    if (userName != "" && userName != undefined)
+        roomsList.children[0].children[0].click();
 });
 textArea.addEventListener("keypress", onButSendMessage);
 

@@ -163,9 +163,10 @@ namespace SocialNetwork.Models.Repositories
             if (user == null) throw new NetworkUserException("Пользователь не существует");
             
             var userChatPairs = from _user in _dbContext.Users
-                        join fact in _dbContext.MembershipInChats on senderId equals fact.UserId
-                        join _chat in _dbContext.Chats on fact.ChatId equals _chat.Id
-                        select 1;
+                                join fact in _dbContext.MembershipInChats on _user.Id equals fact.UserId
+                                join _chat in _dbContext.Chats on fact.ChatId equals _chat.Id
+                                where _user.Id == senderId && _chat.Id == chatId
+                                select 1;
             if(!userChatPairs.Any()) throw new ChatException("Пользователь не состоит в данном чате");
 
             Message message = new Message() { SenderId = senderId, GroupChatId = chatId, Text = text, DateTime = System.DateTime.Now };
@@ -204,8 +205,9 @@ namespace SocialNetwork.Models.Repositories
             if (user == null) throw new NetworkUserException("Пользователь не существует");
 
             var userChatPairs = from _user in _dbContext.Users
-                                join fact in _dbContext.MembershipInChats on userId equals fact.UserId
+                                join fact in _dbContext.MembershipInChats on _user.Id equals fact.UserId
                                 join _chat in _dbContext.Chats on fact.ChatId equals _chat.Id
+                                where _user.Id == userId && _chat.Id == chatId
                                 select fact;
             var userChatPair = userChatPairs.FirstOrDefault();
             if (userChatPair == null) throw new ChatException("Пользователь не состоит в данном чате");
@@ -223,9 +225,10 @@ namespace SocialNetwork.Models.Repositories
             if (user == null) throw new NetworkUserException("Пользователь не существует");
 
             var membershipInChat = from _user in _dbContext.Users
-                                join fact in _dbContext.MembershipInChats on userId equals fact.UserId
-                                join _chat in _dbContext.Chats on fact.ChatId equals _chat.Id
-                                select 1;
+                                   join fact in _dbContext.MembershipInChats on _user.Id equals fact.UserId
+                                   join _chat in _dbContext.Chats on fact.ChatId equals _chat.Id
+                                   where _user.Id == userId && _chat.Id == chatId
+                                   select 1;
             if (!membershipInChat.Any()) throw new ChatException("Пользователь не состоит в данном чате");
 
 

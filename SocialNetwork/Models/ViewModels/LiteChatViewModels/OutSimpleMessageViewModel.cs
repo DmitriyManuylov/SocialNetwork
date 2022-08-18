@@ -5,6 +5,7 @@ namespace SocialNetwork.Models.ViewModels.LiteChatViewModels
     public class OutSimpleMessageViewModel
     {
         public int Id { get; set; }
+        public int RoomId { get; set; }
 
         public string Sender { get; set; }
 

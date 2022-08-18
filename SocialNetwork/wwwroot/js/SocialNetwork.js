@@ -1,11 +1,9 @@
 
 import { User, Chat, Message, SocialNetwork } from "./ViewModels.js";
 import {CreateUserListItem, CreateGroupChatListItem, CreateMessageItem } from "./SocNetHtmlGen.js";
-var access_token;
 var hubConnection = new signalR.HubConnectionBuilder().withUrl("/SocialNetwork").withHubProtocol(new signalR.protocols.msgpack.MessagePackHubProtocol()).build();
 hubConnection.on("MessageRecieved", function (message) {
-    var ChatId = message.ChatId;
-    if (ChatId != currentChatId) return;
+    if (message.ChatId != currentChatId) return;
     var mess = {
         chatId: message.ChatId,
         senderId: message.SenderId,
@@ -39,6 +37,9 @@ window.addEventListener("load", init);
 
 var currentChatbut;
 var currentChatId;
+var isCurrentChatADialog;
+var actionDisconnect = "DisconnectFromChat";
+
 var socNetData;
 var currentChatMessages;
 var messageInput = document.querySelector("#messageInput");
@@ -85,11 +86,10 @@ async function onMessageSend(e, action, chatId) {
 }
 
 
-async function onChatSelected(e, actionConnect, actionDisconnect, chatId) {
+async function onChatSelected(e, actionConnect, isChatADialog, chatId) {
     messagesArea.innerHTML = "";
     var queryString = "?" + "connectionId=" + hubConnection.connectionId;
     var controller = "/SocialNetwork/";
-    
     var targetChatBut = e.target;
     var hiddenChatId = targetChatBut.nextSibling;
     var hiddenUserId = hiddenChatId.nextSibling;
@@ -99,17 +99,19 @@ async function onChatSelected(e, actionConnect, actionDisconnect, chatId) {
             chatId = await GetDialogId(userId);
         }
     }
+
     var urlConnect = location.origin + controller + actionConnect + "/" + chatId;
     if (currentChatbut) {
         currentChatbut.classList.remove("network-list-item-selected");
-        if (actionDisconnect) {
-            var urlDisconnect = location.origin + controller + actionDisconnect + "/" + chatId;
+        if (!isCurrentChatADialog) {
+            var urlDisconnect = location.origin + controller + actionDisconnect + "/" + currentChatId;
             await fetch(urlDisconnect + queryString, {
                 method: "GET"
             });
 
         };
     }
+    isCurrentChatADialog = isChatADialog;
     currentChatbut = targetChatBut;
     currentChatbut.classList.add("network-list-item-selected");
 

@@ -210,6 +210,7 @@ namespace SocialNetwork.Controllers
             Message message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(thisUser.Id, text, chatId));
             ChatMessageViewModel viewModel = new ChatMessageViewModel()
             {
+                ChatId = chatId,
                 SenderId = userId,
                 SenderName = thisUser.UserName,
                 Text = text,
@@ -242,8 +243,7 @@ namespace SocialNetwork.Controllers
                 DateTime = message.DateTime.ToString("f"),
                 SenderLink = $"/User{userId}"
             };
-            await _hubContext.Clients.User(interlocutorId).MessageRecieved(viewModel);
-            await _hubContext.Clients.User(userId).MessageRecieved(viewModel);
+            await _hubContext.Clients.Users(userId, interlocutorId).MessageRecieved(viewModel);
             return Ok();
         }
     }
