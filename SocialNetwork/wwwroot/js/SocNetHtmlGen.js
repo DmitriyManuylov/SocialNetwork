@@ -7,6 +7,7 @@ export function CreateUserListItem(user, onChatSelected, onMessageSend) {
     var hiddenChatId = document.createElement("input");
 
     butUser.classList.add("w-100", "network-list-item");
+    butUser.type = "button";
     butUser.onclick = e => {
         onChatSelected(e, "ConnectToDialog", true, user.chatId);
         messageTextArea.onkeypress = e => onMessageSend(e, "SendMessageToInterlocutor", user.chatId);
@@ -37,6 +38,7 @@ export function CreateGroupChatListItem(chat, onChatSelected, onMessageSend) {
 
     butUser.classList.add("w-100", "network-list-item");
     butUser.innerText = chat.name;
+    butUser.type = "button";
     butUser.onclick = e => {
         onChatSelected(e, "ConnectToChat", false, chat.id);
         messageTextArea.onkeypress = e => onMessageSend(e, "SendMessage",chat.id);

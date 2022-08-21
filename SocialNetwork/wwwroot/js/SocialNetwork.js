@@ -87,6 +87,7 @@ async function onMessageSend(e, action, chatId) {
 
 
 async function onChatSelected(e, actionConnect, isChatADialog, chatId) {
+    if (chatId == currentChatId) return;
     messagesArea.innerHTML = "";
     var queryString = "?" + "connectionId=" + hubConnection.connectionId;
     var controller = "/SocialNetwork/";
@@ -125,4 +126,21 @@ async function onChatSelected(e, actionConnect, isChatADialog, chatId) {
         currentChatMessages.forEach(message => messagesArea.appendChild(CreateMessageItem(message)));
         messagesArea.parentElement.scrollTop = messagesArea.parentElement.scrollHeight;
     }
+
+    
 }
+document.getElementById("but").addEventListener("click", async (e) => {
+    var dialog = document.getElementById("filter");
+    dialog.showModal();
+    //var controller = "/SocialNetwork/";
+    //var urlConnect = location.origin + controller + "Part";
+    //var response = await fetch(urlConnect, {
+    //    method: "GET"
+    //});
+    //var right = document.getElementById("rightSide");
+
+    //var result = await response.text();
+    ////$("@rightSide").append(result);
+
+    //right.appendChild(new DOMParser().parseFromString(result, "text/html").getElementById("chat"));
+});

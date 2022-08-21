@@ -14,12 +14,14 @@ namespace SocialNetwork.Models.Repositories
         IQueryable<Country> Countries { get; }
 
         List<UserViewModel> UsersViewModel { get; }
+        FriendshipFact GetFriendshipFact(string user1Id, string user2Id);
         void InviteFriend(string invitorId, string invitedId);
         void AcceptFriendship(string invitorId, string invitedId);
         List<NetworkUser> FilterUsers(UsersFilter usersFilter);
         NetworkUser GetUserById(string Id);
-        void SetCityInUsersInfo(City city, NetworkUser user);
-        void SetCountryInUsersInfo(Country country, NetworkUser user);
+        NetworkUser UpdateUser(NetworkUser user);
+        void SetCityInUsersInfo(string cityName, NetworkUser user);
+        void SetCountryInUsersInfo(string countryName, NetworkUser user);
         List<InterlocutorViewModel> GetFriends(string userId);
         List<InterlocutorViewModel> GetIncomingFriendshipInvitations(string userId);
         List<InterlocutorViewModel> GetOutgoingFriendshipInvitations(string userId);

@@ -33,7 +33,17 @@ namespace SocialNetwork.Models.Repositories
 
         public NetworkUser GetUserById(string Id)
         {
-            return _dbContext.Users.FirstOrDefault(x => x.Id == Id);
+            return _dbContext.Users
+                             .Include(user => user.City)
+                             .Include(user => user.Country)
+                             .FirstOrDefault(x => x.Id == Id);
+        }
+
+        public NetworkUser UpdateUser(NetworkUser user)
+        {
+            _dbContext.Users.Update(user);
+            _dbContext.SaveChanges();
+            return user;
         }
 
         public void SetUserBirthDate(DateTime birthDate, string userId)
@@ -49,7 +59,9 @@ namespace SocialNetwork.Models.Repositories
         public List<NetworkUser> FilterUsers(UsersFilter usersFilter)
         {
             IQueryable<NetworkUser> users = _dbContext.Users;
-            if (usersFilter.CityId.HasValue) users.Where(user => user.CityId.Value == usersFilter.CityId.Value);
+            users.Include(user => user.City).Include(user => user.Country);
+            if (!string.IsNullOrEmpty(usersFilter.CityName)) users.Where(user => user.City.Name == usersFilter.CityName);
+            if(!string.IsNullOrEmpty(usersFilter.CountryName)) users.Where(user => user.Country.Name == usersFilter.CountryName);
 
             if (!string.IsNullOrEmpty(usersFilter.Name))
             {
@@ -72,49 +84,57 @@ namespace SocialNetwork.Models.Repositories
             {
                 users.Where(user => user.Age < usersFilter.EndAge);
             }
+            
 
             return users.ToList();
 
         }
 
-        public void SetCityInUsersInfo(City city, NetworkUser user)
+        public void SetCityInUsersInfo(string cityName, NetworkUser user)
         {
-            City dbEntry;
-            if (city.Id == 0)
+            City city = _dbContext.Cities.FirstOrDefault(dbCity => dbCity.Name == cityName);
+            if (city == null)
             {
-                _dbContext.Add(city);
-                user.City = city;
+                city = new City()
+                {
+                    Name = cityName,
+                };
+                _dbContext.Cities.Add(city);
+            }
+                
+            user.City = city;
 
-            }
-            else
-            {
-                dbEntry = _dbContext.Cities.FirstOrDefault(dbCity => dbCity.Id == city.Id);
-                if (dbEntry != null)
-                    user.City = city;
-            }
             _dbContext.SaveChanges();
         }
 
-        public void SetCountryInUsersInfo(Country country, NetworkUser user)
-        {
-            Country dbEntry;
-            if (country.Id == 0)
-            {
-                _dbContext.Add(country);
-                user.Country = country;
 
-            }
-            else
+        public void SetCountryInUsersInfo(string countryName, NetworkUser user)
+        {
+            Country country = _dbContext.Countries.FirstOrDefault(dbCountry => dbCountry.Name == countryName);
+            if (country == null)
             {
-                dbEntry = _dbContext.Countries.FirstOrDefault(dbCountry => dbCountry.Id == country.Id);
-                if (dbEntry != null)
-                    user.Country = country;
+                country = new Country()
+                {
+                    Name = countryName,
+                };
+                _dbContext.Countries.Add(country);
             }
+            user.Country = country;
             _dbContext.SaveChanges();
 
         }
 
-
+        public FriendshipFact GetFriendshipFact(string user1Id, string user2Id)
+        {
+            FriendshipFact friendshipFact = _dbContext.FriendshipFacts.FirstOrDefault(ff => ff.InitiatorId == user1Id
+                                                                                                &&
+                                                                                            ff.InvitedId == user2Id
+                                                                                            ||
+                                                                                            ff.InitiatorId == user2Id
+                                                                                                &&
+                                                                                            ff.InvitedId == user1Id);
+            return friendshipFact;
+        }
         /// <summary>
         /// 
         /// </summary>

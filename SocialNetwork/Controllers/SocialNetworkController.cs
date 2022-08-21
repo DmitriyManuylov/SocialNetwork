@@ -199,10 +199,60 @@ namespace SocialNetwork.Controllers
 
         public IActionResult UserPage(string Id)
         {
+            string userId = _userManager.GetUserId(User);
+            FriendshipFact friendshipFact = _usersRepository.GetFriendshipFact(userId, Id);
+            FriendshipFactStates friendshipFactState = FriendshipFactStates.Friends;
             NetworkUser networkUser = _usersRepository.GetUserById(Id);
-            return View(networkUser);
+            if (friendshipFact == null) friendshipFactState = FriendshipFactStates.NotFriends;
+            else
+            {
+                if (friendshipFact.InitiatorId == userId && !friendshipFact.RequestAccepted) friendshipFactState = FriendshipFactStates.OutgoingInvitation;
+                if (friendshipFact.InitiatorId == Id && !friendshipFact.RequestAccepted) friendshipFactState = FriendshipFactStates.IncomingInvitation;
+            }
+            UserPageViewModel userPageViewModel = new UserPageViewModel()
+            {
+                User = networkUser,
+                FriendshipFactState = friendshipFactState,
+            };
+            return View(userPageViewModel);
         }
 
+        public IActionResult FilterUsers(UsersFilter filter)
+        {
+            List<NetworkUser> users = _usersRepository.FilterUsers(filter);
+            List<ExtendedUserViewModel> filteredUsers = new List<ExtendedUserViewModel>(users.Count);
+            foreach (NetworkUser user in users)
+            {
+                ExtendedUserViewModel createdModelItem = new ExtendedUserViewModel()
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    BirthDate = user.BirthDate,
+                    Age = user.Age,
+                    Email = user.Email,
+                    UserPageLink = $"User{user.Id}",
+                    CityName = user.City?.Name,
+                    CountryName = user.Country?.Name,
+                };
+                string fullName;
+                if (!string.IsNullOrEmpty(user.FirstName))
+                {
+                    fullName = user.FirstName;
+                    if (!string.IsNullOrEmpty(user.Surname))
+                        fullName += " " + user.Surname;
+                    fullName += $"({user.UserName})";
+                }
+                else 
+                    fullName = user.UserName;
+
+                createdModelItem.UserName = fullName;
+                filteredUsers.Add(createdModelItem);
+            }
+
+            return PartialView("ChatFramePartial", filteredUsers);
+        }
+
+        [HttpPost]
         public async Task<IActionResult> SendMessage(int chatId, string text)
         {
             string userId = _userManager.GetUserId(User);

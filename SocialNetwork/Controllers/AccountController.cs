@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using SocialNetwork.Models.UserInfoModels;
 using SocialNetwork.Models.ViewModels.AccountViewModels;
+using SocialNetwork.Models.Repositories;
 
 namespace SocialNetwork.Controllers
 {
@@ -16,8 +17,10 @@ namespace SocialNetwork.Controllers
     {
         UserManager<NetworkUser> _userManager;
         SignInManager<NetworkUser> _signInManager;
-        public AccountController(UserManager<NetworkUser> userManager, SignInManager<NetworkUser> signInManager, SocialNetworkDbContext dbContext)
+        IUsersRepository _usersRepository;
+        public AccountController(UserManager<NetworkUser> userManager, SignInManager<NetworkUser> signInManager, IUsersRepository usersRepository)
         {
+            _usersRepository = usersRepository;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -29,6 +32,7 @@ namespace SocialNetwork.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
@@ -37,29 +41,59 @@ namespace SocialNetwork.Controllers
         [HttpPost]
         [AllowAnonymous]
         //[ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterViewModel registrationModel)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            //HttpContext.Request.Form.
-            if(!ModelState.IsValid)
+
+            if (model.BirthDate.HasValue)
             {
-                return View(registrationModel);
+                if (model.BirthDate > System.DateTime.Now)
+                    ModelState.AddModelError("BirthDate", "Вы не из будущего, не врите!");
             }
-            NetworkUser user = await _userManager.FindByNameAsync(registrationModel.Name);
+
+            NetworkUser user = await _userManager.FindByNameAsync(model.Name);
             if (user != null)
             {
                 ModelState.AddModelError("Name", "Пользователь с таким именем уже существует");
-                return View(registrationModel);
             }
-            
-            user = new NetworkUser(registrationModel.Name);
-            user.Email = registrationModel.Email;
-
-            var result = await _userManager.CreateAsync(user, registrationModel.Password);
-            if (!result.Succeeded)
+            else
             {
-                foreach (var error in result.Errors)
-                   ModelState.AddModelError("", error.Description);
-                return View(registrationModel);
+                user = new NetworkUser(model.Name);
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError("", error.Description);
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            if (!string.IsNullOrEmpty(model.City))
+            {
+                _usersRepository.SetCityInUsersInfo(model.City, user);
+            }
+
+            if (!string.IsNullOrEmpty(model.Country))
+            {
+                _usersRepository.SetCityInUsersInfo(model.Country, user);
+            }
+
+            if (string.IsNullOrEmpty(model.Name))
+                user.FirstName = model.FirstName;
+            if (string.IsNullOrEmpty(model.LastName))
+                user.Surname = model.LastName;
+            if (string.IsNullOrEmpty(model.Email))
+                user.Email = model.Email;
+            if (model.BirthDate.HasValue)
+                user.BirthDate = model.BirthDate;
+
+            if (model.BirthDate.HasValue)
+            {
+                user.BirthDate = model.BirthDate;
+                user.SetAge();
             }
             return RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", ""));
             
@@ -105,6 +139,7 @@ namespace SocialNetwork.Controllers
 
         }
 
+        [Authorize]
         public async Task<IActionResult> LogoutAsync()
         {
             await _signInManager.SignOutAsync();
@@ -123,6 +158,68 @@ namespace SocialNetwork.Controllers
         public IActionResult Settings(NetworkUser User)
         {
             return View();
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult EditUserData()
+        {
+            string userId = _userManager.GetUserId(User);
+            NetworkUser user = _usersRepository.GetUserById(userId);
+            EditUserDataViewModel model = new EditUserDataViewModel()
+            {
+                Name = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.Surname,
+                Email = user.Email,
+                BirthDate = user.BirthDate,
+                City = user.City?.Name,
+                Country = user.Country?.Name,
+            };
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult EditUserData(EditUserDataViewModel model)
+        {
+            string userId = _userManager.GetUserId(User);
+            NetworkUser user = _usersRepository.GetUserById(userId);
+
+            if (model.BirthDate.HasValue)
+            {
+                if (model.BirthDate > System.DateTime.Now)
+                    ModelState.AddModelError("BirthDate", "Вы не из будущего, не врите!");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            if (!string.IsNullOrEmpty(model.City))
+            {
+                _usersRepository.SetCityInUsersInfo(model.City, user);
+            }
+
+            if (!string.IsNullOrEmpty(model.Country))
+            {
+                _usersRepository.SetCountryInUsersInfo(model.Country, user);
+            }
+
+            if (string.IsNullOrEmpty(model.Name))
+                user.FirstName = model.FirstName;
+            if (string.IsNullOrEmpty(model.LastName))
+                user.Surname = model.LastName;
+            if (string.IsNullOrEmpty(model.Email))
+                user.Email = model.Email;
+            if (model.BirthDate.HasValue)
+            {
+                user.BirthDate = model.BirthDate;
+                user.SetAge();
+            }
+            _usersRepository.UpdateUser(user);
+            return RedirectToAction(nameof(Index),nameof(SocialNetworkController).Replace("Controller",""));
         }
     }
 }

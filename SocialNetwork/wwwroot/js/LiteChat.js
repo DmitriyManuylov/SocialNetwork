@@ -43,15 +43,6 @@ hubConnection.onreconnected(console.log("реконнект"));
 hubConnection.onclose(console.log("Отрубилось подключение"));
 hubConnection.start();
 
-function InitialSelectRoom() {
-    if (roomsList.children.length > 0) {
-        if (userName == "" || userName == undefined) {
-            userNameDialog.showModal();
-        }
-
-    }
-}
-
 function FillRoomsList(rooms) {
     rooms.forEach(room => AddRoomToList(room, onRoomSelect));
 }
@@ -76,11 +67,10 @@ function init(e) {
 }
 
 function onRoomSelect(e) {
-    //if (userName == "" || userName == undefined) {
-    //    userNameDialog.showModal();
-    //    return;
-    //}
-    var userName = document.getElementById("senderInput").value;
+    if (userName == "" || userName == undefined) {
+        userNameDialog.showModal();
+        return;
+    }
     var connectionId = hubConnection.connectionId;
     var roomId;
     if (currentRoom) {
@@ -184,8 +174,6 @@ function SendMessage(message) {
 butSenderName.addEventListener("click", () => {
     userName = senderNameElement.value;
     userNameDialog.close();
-    if (userName != "" && userName != undefined)
-        roomsList.children[0].children[0].click();
 });
 textArea.addEventListener("keypress", onButSendMessage);
 

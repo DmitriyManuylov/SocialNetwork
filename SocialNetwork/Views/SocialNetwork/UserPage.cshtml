@@ -2,9 +2,88 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @using SocialNetwork.Models.UserInfoModels
-@model NetworkUser
+@using SocialNetwork.Models.ViewModels.SocialNetworkViewModels
+@model UserPageViewModel
 @{
+    var user = await _userManager.GetUserAsync(User);
     Layout = "_MainLayout";
 }
+@section Styles {
+    <link rel="stylesheet" href="/css/UserPageStyles.css"/>
+}
+<div id="userInfoWrap">
+    <div id="userInfo" class="flex-container flex-column align-items-center">
+        <div class="">Никнейм: @Model.User.UserName</div>
 
-<div>Юзверь:@Model.UserName</div>
+        @if (!string.IsNullOrEmpty(Model.User.FirstName))
+        {
+            <div class="">
+                Имя: @Model.User.FirstName
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.User.Surname))
+        {
+            <div>
+                Фамилия: @Model.User.Surname
+            </div>
+        }
+        @if (Model.User.Age.HasValue)
+        {
+            <div>
+                Возраст: @Model.User.Age
+            </div>
+        }
+        @if (Model.User.City != null)
+        {
+            <div>
+                Город: @Model.User.City.Name
+            </div>
+        }
+        @if (Model.User.Country != null)
+        {
+            <div>
+                Страна: @Model.User.Country.Name
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.User.Email))
+        {
+            <div>
+                Электронная почта: @Model.User.Email
+            </div>
+        }
+        @if(Model.User.Id != user.Id)
+        {
+            <div>
+                @switch (Model.FriendshipFactState)
+                {
+                    case FriendshipFactStates.NotFriends:
+                        {
+                            <button id="Invite">Пригласить</button>
+                            break;
+                        }
+                    case FriendshipFactStates.IncomingInvitation:
+                        {
+                            <button id="Accept">Принять приглашение</button>
+                            break;
+                        }
+                    case FriendshipFactStates.OutgoingInvitation:
+                        {
+                            <text>Отправлено приглашение</text>
+                            break;
+                        }
+                    case FriendshipFactStates.Friends:
+                        {
+                            <text>Вы состоите в дружбе</text>
+                            break;
+                        }
+                }
+                <button>
+                    Написать сообщение
+                </button>
+
+            </div>
+        }
+
+    </div>
+</div>
+

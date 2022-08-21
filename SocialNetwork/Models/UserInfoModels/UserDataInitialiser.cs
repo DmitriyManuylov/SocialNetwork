@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using SocialNetwork.Models.ChatModels;
 using SocialNetwork.Models.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace SocialNetwork.Models.UserInfoModels
 {
@@ -14,8 +15,7 @@ namespace SocialNetwork.Models.UserInfoModels
                                       SocialNetworkDbContext dbContext, 
                                       IUsersRepository usersRepository)
         {
-            List<City> cities = dbContext.Cities.Take(13).ToList();
-            List<Country> countries = dbContext.Countries.Take(5).ToList();
+            List<City> cities = dbContext.Cities.Take(13).Include(city => city.Country).ToList();
             List<GroupChat> chats = dbContext.Chats.Take(6).ToList();
 
 
@@ -35,6 +35,7 @@ namespace SocialNetwork.Models.UserInfoModels
                 userManager.CreateAsync(IvanIvanov, "qWeQrt_13y").Wait();
 
                 IvanIvanov.City = cities[1];
+                IvanIvanov.Country = cities[1].Country;
                 IvanIvanov.Chats = new List<GroupChat>();
                 IvanIvanov.Chats.Add(chats[1]);
                 IvanIvanov.Chats.Add(chats[3]);
@@ -51,6 +52,7 @@ namespace SocialNetwork.Models.UserInfoModels
                 Iam.Id = Guid.NewGuid().ToString();
                 userManager.CreateAsync(Iam, "qWeQrt_14y").Wait();
                 Iam.City = cities[2];
+                Iam.Country = Iam.City.Country;
                 Iam.Chats = new List<GroupChat>();
                 Iam.Chats.Add(chats[2]);
                 Iam.Chats.Add(chats[3]);
@@ -72,6 +74,7 @@ namespace SocialNetwork.Models.UserInfoModels
                 Petr_Sidorov.Id = Guid.NewGuid().ToString();
                 Petr_Sidorov.SetAge();
                 Petr_Sidorov.City = cities[5];
+                Petr_Sidorov.Country = cities[5].Country;
                 Petr_Sidorov.Chats = new List<GroupChat>();
                 Petr_Sidorov.Chats.Add(chats[5]);
                 Petr_Sidorov.Chats.Add(chats[0]);
@@ -89,6 +92,7 @@ namespace SocialNetwork.Models.UserInfoModels
                 Sidor_Petrov.Id = Guid.NewGuid().ToString();
                 Sidor_Petrov.SetAge();
                 Sidor_Petrov.City = cities[3];
+                Sidor_Petrov.Country = cities[3].Country;
                 Sidor_Petrov.Chats = new List<GroupChat>();
                 Sidor_Petrov.Chats.Add(chats[4]);
                 Sidor_Petrov.Chats.Add(chats[2]);
@@ -110,6 +114,7 @@ namespace SocialNetwork.Models.UserInfoModels
                 Vasiliy_Kuznetsov.Id = Guid.NewGuid().ToString();
                 Vasiliy_Kuznetsov.SetAge();
                 Vasiliy_Kuznetsov.City = cities[6];
+                Vasiliy_Kuznetsov.Country = cities[6].Country;
                 Vasiliy_Kuznetsov.Chats = new List<GroupChat>();
                 Vasiliy_Kuznetsov.Chats.Add(chats[4]);
                 Vasiliy_Kuznetsov.Chats.Add(chats[0]);

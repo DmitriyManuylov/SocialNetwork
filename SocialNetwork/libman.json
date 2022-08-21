@@ -12,6 +12,11 @@
       "provider": "unpkg",
       "library": "@microsoft/signalr-protocol-msgpack@6.0.6",
       "destination": "wwwroot/lib/microsoft/signalr-protocol-msgpack/"
+    },
+    {
+      "provider": "cdnjs",
+      "library": "bootstrap@5.2.0",
+      "destination": "wwwroot/lib/bootstrap/"
     }
   ]
 }

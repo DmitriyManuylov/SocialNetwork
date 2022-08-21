@@ -57,7 +57,7 @@ namespace SocialNetwork.Models.UserInfoModels
             DateTime now = DateTime.Now;
             int age = DateTime.Now.Year - BirthDate.Value.Year;
             DateTime birthDateInCurrentYear = new DateTime(now.Year, BirthDate.Value.Month, BirthDate.Value.Day);
-            if (birthDateInCurrentYear < now) age--;
+            if (birthDateInCurrentYear > now) age--;
             Age = age;
             return age;
         }

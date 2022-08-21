@@ -14,7 +14,10 @@
 <div id="socialNetworkBlock">
         <div id="leftSide"  class="flex-item side-bar">
             <div id="comrades">
-                <h5 class="border-bottom-list-header">Товарищи</h5>
+                <div class="list-header">
+                    <h5>Товарищи</h5>
+                </div>
+                
                 <div id="comradesAreaWrap">
                     <div id="comradesArea">
                         
@@ -22,7 +25,10 @@
                 </div>
             </div>
             <div id="collectives">
-                <h5 class="border-bottom-list-header">Коллективы товарищей</h5>
+                <div class="list-header">
+                    <h5>Коллективы товарищей</h5>
+                </div>
+                
                 <div id="collectivesAreaWrap">
                     <div id="collectivesArea">
 
@@ -39,7 +45,36 @@
         </div>
         @await Html.PartialAsync("ChatFramePartial")
         <div id="rightSide" class="flex-item side-bar">
-
+            <div class="accordion" id="filters">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="panelsStayOpen-headingOne">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false" aria-controls="panelsStayOpen-collapseOne">
+                            Поиск пользователей
+                        </button>
+                    </h2>
+                    <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingOne" style="">
+                        <div class="accordion-body">
+                            <form>
+                                <input type="text" placeholder="Имя и Фамилия" />
+                                <input list="citiesList" id="cities" placeholder="Город" />
+                                <input type="number" id="startAge" placeholder="Минимальный возраст"/>
+                                <input type="number" id="endAge" placeholder="Максимальный возраст" />
+                                <datalist id="citiesList">
+                                    <option value="Москва">"</option>
+                                    <option value="Ростов-на-Дону">"</option>
+                                    <option value="Санкт-Петербург"></option>
+                                </datalist>
+                                <input list="countiesList" id="counties" placeholder="Страна" />
+                                <datalist id="countiesList">
+                                    <option value="Россия"></option>
+                                    <option value="Белоруссия"></option>
+                                    <option value="Франция"></option>
+                                </datalist>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
 </div>
