@@ -4,10 +4,10 @@ namespace SocialNetwork.Models.UserInfoModels
 {
     public class UsersFilter
     {
-        public string CityName;
-        public string CountryName;
-        public int? StartAge;
-        public int? EndAge;
-        public string Name;
+        public string Name { get; set; }
+        public string CityName { get; set; }
+        public string CountryName { get; set; }
+        public int? StartAge { get; set; }
+        public int? EndAge { get; set; }
     }
 }

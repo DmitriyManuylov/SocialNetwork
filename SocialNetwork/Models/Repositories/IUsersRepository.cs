@@ -17,7 +17,7 @@ namespace SocialNetwork.Models.Repositories
         FriendshipFact GetFriendshipFact(string user1Id, string user2Id);
         void InviteFriend(string invitorId, string invitedId);
         void AcceptFriendship(string invitorId, string invitedId);
-        List<NetworkUser> FilterUsers(UsersFilter usersFilter);
+        List<NetworkUser> FilterUsers(UsersFilter usersFilter, string userId);
         NetworkUser GetUserById(string Id);
         NetworkUser UpdateUser(NetworkUser user);
         void SetCityInUsersInfo(string cityName, NetworkUser user);

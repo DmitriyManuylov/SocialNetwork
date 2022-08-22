@@ -19,6 +19,7 @@
     }
         .network-list-item a:hover {
             color: white;
+            text-decoration: underline;
         }
     .network-list-item-selected {
         background-color: darkslategrey;

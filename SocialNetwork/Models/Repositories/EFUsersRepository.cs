@@ -56,37 +56,37 @@ namespace SocialNetwork.Models.Repositories
             user.SetAge();
         }
 
-        public List<NetworkUser> FilterUsers(UsersFilter usersFilter)
+        public List<NetworkUser> FilterUsers(UsersFilter usersFilter, string userId)
         {
             IQueryable<NetworkUser> users = _dbContext.Users;
-            users.Include(user => user.City).Include(user => user.Country);
-            if (!string.IsNullOrEmpty(usersFilter.CityName)) users.Where(user => user.City.Name == usersFilter.CityName);
-            if(!string.IsNullOrEmpty(usersFilter.CountryName)) users.Where(user => user.Country.Name == usersFilter.CountryName);
+            users = users.Include(user => user.City).Include(user => user.Country).Where(user => user.Id != userId);
+            if (!string.IsNullOrEmpty(usersFilter.CityName)) users = users.Where(user => user.City.Name == usersFilter.CityName);
+            if (!string.IsNullOrEmpty(usersFilter.CountryName)) users = users.Where(user => user.Country.Name == usersFilter.CountryName);
 
             if (!string.IsNullOrEmpty(usersFilter.Name))
             {
                 string[] nameParts = usersFilter.Name.Split(' ');
-                if (nameParts.Length == 1) users.Where(user => EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%"));
-                if (nameParts.Length == 2) users.Where(user => (EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%")
-                                                                    &&
-                                                                EF.Functions.Like(user.Surname, $"%{nameParts[1]}%"))
-                                                                    ||
-                                                                (EF.Functions.Like(user.FirstName, $"%{nameParts[1]}%")
-                                                                    &&
-                                                                EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%")));
+                if (nameParts.Length == 1) users = users.Where(user => EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%"));
+                if (nameParts.Length == 2) users = users.Where(user => (EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%")
+                                                                            &&
+                                                                        EF.Functions.Like(user.Surname, $"%{nameParts[1]}%"))
+                                                                            ||
+                                                                        (EF.Functions.Like(user.FirstName, $"%{nameParts[1]}%")
+                                                                            &&
+                                                                        EF.Functions.Like(user.Surname, $"%{nameParts[0]}%")));
             }
             if (usersFilter.StartAge.HasValue)
             {
-                users.Where(user => user.Age > usersFilter.StartAge);
+                users = users.Where(user => user.Age >= usersFilter.StartAge);
             }
 
             if (usersFilter.EndAge.HasValue)
             {
-                users.Where(user => user.Age < usersFilter.EndAge);
+                users = users.Where(user => user.Age <= usersFilter.EndAge);
             }
-            
 
-            return users.ToList();
+            var result = users.ToList();
+            return result;
 
         }
 

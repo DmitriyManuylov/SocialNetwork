@@ -7,7 +7,7 @@
 }
 
 #comrades {
-    height: 55%;
+    max-height: 55%;
     width: 100%;
     border-style: double;
     border-color: silver;
@@ -24,7 +24,7 @@
     width: 100%;
 }
 #collectives {
-    height: 45%;
+    max-height: 45%;
     width: 100%;
     border-style: double;
     border-width: 3px;
@@ -52,7 +52,57 @@
     margin: 0;
     color: #7d1d03;
 }
-#filter{
+#filters{
+    width: 100%;
+
+}
+#filters input {
+    width: 100%;
+    border-bottom-style:solid;
+    border-bottom-width: 1px;
+}
+#filters div {
+    width: 100%;
+    padding: 5px;
+}
+    #filters div div input{
+        width: 45%;
+        display: inline;
+        padding: 5px;
+    }
+    #filters button{
+        width: 100%;
+    }
+#age {
+    padding: 0;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+#age input{
+    text-align:center;
+}
+#filteredUsersWrap{
+    height: calc(100% - 38px);
+    padding-top: 5px;
+    width: 100%;
+}
+
+.filtered-user-wrap{
+    border: 1px solid black;
+}
+
+.no-padding {
+    padding: 0;
+}
+.no-vertical-padding{
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.no-accordion-style{
+
+}
+.no-accordion-style:focus{
+    outline: 0;
+    box-shadow: none;
 }

@@ -31,7 +31,14 @@ async function init() {
         socNetData = await response.json();
         socNetData.friends.forEach(friend => comradesArea.appendChild(CreateUserListItem(friend, onChatSelected, onMessageSend)));
         socNetData.chats.forEach(chat => collectivesArea.appendChild(CreateGroupChatListItem(chat, onChatSelected, onMessageSend)));
+        /*if (Headers.has("chatId"))*/ {
+            var inputChatId = window.Headers.get("chatId");
+            inputChatBut = document.getElementById("chat" + inputChatId);
+            inputChatBut.click();
+        }
+        
     }
+
 }
 window.addEventListener("load", init);
 
@@ -98,6 +105,7 @@ async function onChatSelected(e, actionConnect, isChatADialog, chatId) {
         var userId = hiddenUserId.value;
         if (!chatId) {
             chatId = await GetDialogId(userId);
+            targetChatBut.setAttribute("id", "chat" + chatId);
         }
     }
 
@@ -129,18 +137,43 @@ async function onChatSelected(e, actionConnect, isChatADialog, chatId) {
 
     
 }
-document.getElementById("but").addEventListener("click", async (e) => {
-    var dialog = document.getElementById("filter");
-    dialog.showModal();
-    //var controller = "/SocialNetwork/";
-    //var urlConnect = location.origin + controller + "Part";
-    //var response = await fetch(urlConnect, {
-    //    method: "GET"
-    //});
-    //var right = document.getElementById("rightSide");
+document.getElementById("applyFilter").addEventListener("click", async (e) => {
+    e.preventDefault();
 
-    //var result = await response.text();
-    ////$("@rightSide").append(result);
+    var elements = filterForm.elements;
+    var controller = "/SocialNetwork/";
 
-    //right.appendChild(new DOMParser().parseFromString(result, "text/html").getElementById("chat"));
+    var formData = new FormData(filterForm);
+    //formData.append("Name", elements.Name.value);
+    //formData.append("CityName", elements.CityName.value);
+    //formData.append("CountryName", elements.CountryName.value);
+    //formData.append("StartAge", parseInt(elements.StartAge.value));
+    //formData.append("EndAge", parseInt(elements.EndAge.value));
+
+    var jsonData = JSON.stringify({
+        Name: elements.Name.value,
+        CityName: elements.CityName.value,
+        CountryName: elements.CountryName.value,
+        StartAge: parseInt(elements.StartAge.value),
+        EndAge: parseInt(elements.EndAge.value)
+    });
+    var urlConnect = location.origin + controller + "FilterUsers";
+    var response = await fetch(urlConnect, {
+        method: "POST",
+        body: jsonData
+    });
+    var filteredUsersWrap = document.getElementById("filteredUsersWrap");
+
+    var result = await response.text();
+    //$("@rightSide").append(result);
+    filteredUsersWrap.innerHTML = "";
+    var downloadedPartialView = new DOMParser().parseFromString(result, "text/html").getElementById("filteredUsers");
+    var partialView;
+    if (downloadedPartialView)
+        partialView = downloadedPartialView;
+    else {
+        partialView = document.createElement("div");
+        partialView.innerText = "Не найдено ни одного пользователя";
+    }
+    filteredUsersWrap.appendChild(partialView);
 });

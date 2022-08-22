@@ -34,9 +34,9 @@ namespace SocialNetwork.Controllers
             _userManager = userManager;
             _hubContext = hubContext;
         }
-        public IActionResult Index()
+        public IActionResult Index(int? chatId = null)
         {
-            return View();
+            return View(chatId);
         }
 
         public IActionResult Data()
@@ -217,9 +217,20 @@ namespace SocialNetwork.Controllers
             return View(userPageViewModel);
         }
 
-        public IActionResult FilterUsers(UsersFilter filter)
+        [HttpPost]
+        public IActionResult FilterUsers(UsersFilter filter)/*string Name, string CityName, string CountryName, int? StartAge, int? EndAge)*/
         {
-            List<NetworkUser> users = _usersRepository.FilterUsers(filter);
+            // = new UsersFilter()
+            //{
+            //    Name = Name,
+            //    CityName = CityName,
+            //    CountryName= CountryName,
+            //    StartAge = StartAge,
+            //    EndAge = EndAge
+            //};
+            //, string Name, string CityName, string Country, int? StartAge, int? EndAge
+            string userId = _userManager.GetUserId(User);
+            List<NetworkUser> users = _usersRepository.FilterUsers(filter, userId);
             List<ExtendedUserViewModel> filteredUsers = new List<ExtendedUserViewModel>(users.Count);
             foreach (NetworkUser user in users)
             {
@@ -249,7 +260,7 @@ namespace SocialNetwork.Controllers
                 filteredUsers.Add(createdModelItem);
             }
 
-            return PartialView("ChatFramePartial", filteredUsers);
+            return PartialView("FilteredUsersPart", filteredUsers);
         }
 
         [HttpPost]

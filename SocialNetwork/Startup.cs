@@ -38,7 +38,7 @@ namespace SocialNetwork
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             string identityConnectionString = Configuration.GetConnectionString("IdentityConnection");
 
-            services.AddDbContext<SocialNetworkDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<SocialNetworkDbContext>(options => options.UseSqlServer(connectionString)).AddLogging();
 
             services.AddScoped<ILiteChatRoomsRepository, EFLiteChatRoomsRepository>();
             services.AddScoped<ISocialNetworkRepository, EFSocialNetworkRepository>();
@@ -76,6 +76,7 @@ namespace SocialNetwork
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

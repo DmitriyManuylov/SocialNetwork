@@ -39,6 +39,10 @@ namespace SocialNetwork
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.ConfigureLogging(logging =>
+                    {
+                        logging.AddConsole();
+                    });
                 });
     }
 }

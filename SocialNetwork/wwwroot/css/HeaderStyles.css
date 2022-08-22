@@ -2,7 +2,9 @@
     padding: 0;
     margin: 0;
 }
-
+a{
+    text-decoration: none;
+}
 :root {
     --footer-height: 135px;
     --header-height: 50px;
@@ -47,6 +49,7 @@ body {
 
     #networkHeaderLink a {
         color: white;
+        text-decoration: none;
     }
 
         #networkHeaderLink a:hover {

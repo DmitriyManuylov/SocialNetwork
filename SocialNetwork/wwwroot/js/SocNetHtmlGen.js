@@ -23,6 +23,7 @@ export function CreateUserListItem(user, onChatSelected, onMessageSend) {
     userLink.innerText = user.userName;
 
     butUser.appendChild(userLink);
+    butUser.setAttribute("id", "chat" + user.chatId);
     listItemDiv.appendChild(butUser);
     listItemDiv.appendChild(hiddenChatId);
     listItemDiv.appendChild(hiddenId);
