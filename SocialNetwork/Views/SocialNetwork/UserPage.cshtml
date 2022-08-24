@@ -13,45 +13,52 @@
 }
 <div id="userInfoWrap">
     <div id="userInfo" class="flex-container flex-column align-items-center">
-        <div class="">Никнейм: @Model.User.UserName</div>
-
-        @if (!string.IsNullOrEmpty(Model.User.FirstName))
-        {
-            <div class="">
-                Имя: @Model.User.FirstName
-            </div>
-        }
-        @if (!string.IsNullOrEmpty(Model.User.Surname))
-        {
-            <div>
-                Фамилия: @Model.User.Surname
-            </div>
-        }
+            
+                <div class="">Никнейм: @Model.User.UserName</div>
+                <input type="hidden" asp-for="User.Id">
+            <div class="flex-container flex-row user-page-row">
+            @if (!string.IsNullOrEmpty(Model.User.FirstName))
+            {
+                <div class="">
+                    Имя: @Model.User.FirstName
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.User.Surname))
+            {
+                <div>
+                    Фамилия: @Model.User.Surname
+                </div>
+            }
+        </div>
+        
+        <div class="flex-container flex-row user-page-row">
+            @if (Model.User.City != null)
+            {
+                <div>
+                    Город: @Model.User.City.Name
+                </div>
+            }
+            @if (Model.User.Country != null)
+            {
+                <div>
+                    Страна: @Model.User.Country.Name
+                </div>
+            }
+        </div>
         @if (Model.User.Age.HasValue)
         {
             <div>
                 Возраст: @Model.User.Age
             </div>
         }
-        @if (Model.User.City != null)
-        {
-            <div>
-                Город: @Model.User.City.Name
-            </div>
-        }
-        @if (Model.User.Country != null)
-        {
-            <div>
-                Страна: @Model.User.Country.Name
-            </div>
-        }
+        
         @if (!string.IsNullOrEmpty(Model.User.Email))
         {
             <div>
                 Электронная почта: @Model.User.Email
             </div>
         }
-        @if(Model.User.Id != user.Id)
+        @if (Model.User.Id != user.Id)
         {
             <div>
                 @switch (Model.FriendshipFactState)
@@ -77,13 +84,17 @@
                             break;
                         }
                 }
-                <button>
+
+                <button type="submit" id="SendMessageBut" class="btn btn-outline-primary">
                     Написать сообщение
                 </button>
-
             </div>
         }
 
     </div>
 </div>
-
+@section Scripts{
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
+    <script src="~/js/UserPage.js"></script>
+}

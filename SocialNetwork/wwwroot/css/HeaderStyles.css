@@ -75,3 +75,10 @@ body {
             background-color: slategrey;
             text-decoration: none;
         }
+.social-links {
+    text-align:center;
+    width: 500px;
+}
+#socialLinks {
+    position:static;
+}

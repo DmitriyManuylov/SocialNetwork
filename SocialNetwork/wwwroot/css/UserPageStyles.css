@@ -4,11 +4,16 @@
 }
 #userInfoWrap {
     display: flex;
-    align-items: self-start;
+    align-items: center;
     flex-direction: column;
+
 }
 
 #userInfo {
     padding: 10px;
-    background-color: silver;
+    background-color: white;
+}
+.user-page-row{
+    width: 100%;
+    justify-content: space-between;
 }

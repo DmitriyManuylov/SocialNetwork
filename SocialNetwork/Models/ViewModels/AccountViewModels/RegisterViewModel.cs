@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SocialNetwork.Models.UserInfoModels;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace SocialNetwork.Models.ViewModels.AccountViewModels
@@ -34,6 +35,9 @@ namespace SocialNetwork.Models.ViewModels.AccountViewModels
         [Display(Name = "Дата рождения")]
         [DataType(DataType.Date)]
         public DateTime? BirthDate { get; set; }
+
+        [Display(Name = "Пол")]
+        public Gender Gender { get; set; }
 
         [Display(Name = "Город")]
         [RegularExpression(@"[a-zA-Zа-яА-Я- ]+", ErrorMessage = "Название города может содержать буквы, символы пробела и дефиса")]

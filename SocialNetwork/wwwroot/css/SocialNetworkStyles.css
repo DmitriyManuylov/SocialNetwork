@@ -19,6 +19,8 @@
     height: calc(100% - 45px);
     overflow-x: hidden;
     overflow-y: auto;
+    border-top: double;
+    border-top-color: slategrey;
 }
 #comradesArea {
     width: 100%;
@@ -26,10 +28,6 @@
 #collectives {
     max-height: 45%;
     width: 100%;
-    border-style: double;
-    border-width: 3px;
-    border-color: silver;
-    border-radius: 5px;
 }
 
 #collectivesAreaWrap {
@@ -38,15 +36,14 @@
     overflow-x: hidden;
     overflow-y: auto;
     max-height: calc(100% - 45px);
+    border-top: double;
+    border-top-color: slategrey;
 }
 #collectivesArea {
     width: 100%;
 }
 .list-header {
-    padding-top: 3px;
-    padding-bottom: 5px;
-    border-bottom: double;
-    border-bottom-color: slategrey;
+
 }
 .list-header h5{
     margin: 0;
@@ -88,16 +85,16 @@
     width: 100%;
 }
 
-.filtered-user-wrap{
-    border: 1px solid black;
+.filtered-user-wrap {
+    border: 1px solid slategray;
+    border-radius: 5px;
 }
 
 .no-padding {
     padding: 0;
 }
 .no-vertical-padding{
-    padding-top: 0;
-    padding-bottom: 0;
+
 }
 .no-accordion-style{
 

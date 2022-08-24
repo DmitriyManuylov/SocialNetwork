@@ -1,7 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
-@model int?
+
 @{
     Layout = "_MainLayout";
 }
@@ -12,53 +12,79 @@
     <link rel="stylesheet" href="/css/MessageStyle.css" />
 }
 
-<div id="socialNetworkBlock">
-        <div id="leftSide"  class="flex-item side-bar">
-            <div id="comrades">
+    <div id="socialNetworkBlock">
+        <div id="leftSide" class="flex-item side-bar">
 
+            <div class="accordion" id="accordionLinks">
 
+                <div id="comrades" class="accordion-item">
 
-                <div class="accordion" id="accordionPanelsStayOpenExample">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                            <button class="accordion-button no-vertical-padding no-accordion-style" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-                                <div class="list-header">
-                                    <h5>Товарищи</h5>
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button collapsed no-vertical-padding no-accordion-style" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                            <div class="list-header">
+                                <h5>Товарищи</h5>
+                            </div>
+
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionLinks">
+                        <div class="accordion-body no-padding">
+                            <div id="comradesAreaWrap">
+                                <div id="comradesArea">
                                 </div>
-                                
-                            </button>
-                        </h2>
-                        <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
-                            <div class="accordion-body no-padding">
-                                <div id="comradesAreaWrap">
-                                    <div id="comradesArea">
-                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="collectives" class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed no-vertical-padding no-accordion-style" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <div class="list-header">
+                                <h5>Коллективы товарищей</h5>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionLinks">
+                        <div class="accordion-body no-padding">
+                            <div id="collectivesAreaWrap">
+                                <div id="collectivesArea">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
-            </div>
-            <div id="collectives">
-                <div class="list-header">
-                    <h5>Коллективы товарищей</h5>
-                </div>
-                
-                <div id="collectivesAreaWrap">
-                    <div id="collectivesArea">
-
+                <div id="interlocutors" class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed no-vertical-padding no-accordion-style" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            <div class="list-header">
+                                <h5>Собеседники</h5>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionLinks">
+                        <div class="accordion-body no-padding">
+                            <div id="interlocutorsAreaWrap">
+                                <div id="interlocutorsArea">
+                                    fgsdfgdf
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div id="roomsListWrap" class="">
-                <div id="roomsList">
 
-                </div>
-            </div>
 
         </div>
+
+
+        <div id="roomsListWrap" class="">
+            <div id="roomsList">
+            </div>
+        </div>
+
+    
         @await Html.PartialAsync("ChatFramePartial")
         <div id="rightSide" class="flex-item side-bar">
             <div class="dropdown" id="filters">
@@ -100,9 +126,10 @@
 
             </div>
         </div>
-
-</div>
+    </div>
+    @section Scripts{
     <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
     <script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
-    <script type="module" src="~/js//SocialNetwork.js"></script>
+    <script type="module" src="~/js/SocialNetwork.js"></script>
+    }
     

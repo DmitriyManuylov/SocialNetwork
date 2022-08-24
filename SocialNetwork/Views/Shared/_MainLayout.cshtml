@@ -27,8 +27,11 @@
                 <a asp-action="Chat" asp-controller="Chat">4ЕБУР.НЕТЪ</a>
             </div>
             
+            @if(isSignedIn){
+                @await Component.InvokeAsync("SocialNetworkLinks")
+            }
             <div id="networkHeaderLogin">
-                @if(_signInManager.IsSignedIn(User))
+                @if(isSignedIn)
                 {
                     if (Context.Request.Path != $"/User{userId}")
                     {

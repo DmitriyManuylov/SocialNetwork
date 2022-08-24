@@ -200,6 +200,7 @@ namespace SocialNetwork.Models.Repositories
                                                   join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
                                                   where ff.InitiatorId == userId && ff.RequestAccepted == true
                                                   select new InterlocutorViewModel { Id = user.Id, UserName = user.UserName };
+
             List<InterlocutorViewModel> friendsList = friendsIn.ToList();
             List<InterlocutorViewModel> friendsOutList = friendsOut.ToList();
 

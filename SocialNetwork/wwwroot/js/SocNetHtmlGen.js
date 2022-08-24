@@ -33,14 +33,14 @@ export function CreateUserListItem(user, onChatSelected, onMessageSend) {
 
 export function CreateGroupChatListItem(chat, onChatSelected, onMessageSend) {
     var listItemDiv = document.createElement("div");
-    var butUser = document.createElement("button");
+    var butChat = document.createElement("button");
     var hiddenId = document.createElement("input");
 
 
-    butUser.classList.add("w-100", "network-list-item");
-    butUser.innerText = chat.name;
-    butUser.type = "button";
-    butUser.onclick = e => {
+    butChat.classList.add("w-100", "network-list-item");
+    butChat.innerText = chat.name;
+    butChat.type = "button";
+    butChat.onclick = e => {
         onChatSelected(e, "ConnectToChat", false, chat.id);
         messageTextArea.onkeypress = e => onMessageSend(e, "SendMessage",chat.id);
     };
@@ -48,7 +48,8 @@ export function CreateGroupChatListItem(chat, onChatSelected, onMessageSend) {
     hiddenId.type = "hidden";
     hiddenId.value = chat.id.toString();
 
-    listItemDiv.appendChild(butUser);
+    butChat.setAttribute("id", "chat" + chat.id);
+    listItemDiv.appendChild(butChat);
     listItemDiv.appendChild(hiddenId);
     listItemDiv.classList.add("w-100");
     return listItemDiv;

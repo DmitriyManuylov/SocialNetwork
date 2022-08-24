@@ -51,6 +51,7 @@ namespace SocialNetwork.Models.UserInfoModels
 
         public int? CountryId { get; set; }
 
+        public Gender Gender { get; set; }
         public int SetAge()
         {
             if (!BirthDate.HasValue) throw new NetworkUserException("Не задана дата рождения пользователя");
@@ -62,5 +63,12 @@ namespace SocialNetwork.Models.UserInfoModels
             return age;
         }
 
+    }
+
+    public enum Gender
+    {
+        NotSpecified,
+        Male,
+        Female
     }
 }

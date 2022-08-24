@@ -42,24 +42,13 @@ namespace SocialNetwork.Controllers
         public IActionResult Data()
         {
             string userId = _userManager.GetUserId(User);
-            SocialNetworkViewModel model = new SocialNetworkViewModel()
+
+            SocialLinksViewModel model = new SocialLinksViewModel()
             {
                 Chats = _socialNetworkRepository.GetUserChats(userId),
                 Friends = _usersRepository.GetFriends(userId),
-                IncomingFriendshipInvitations = _usersRepository.GetIncomingFriendshipInvitations(userId),
-                OutgoingFriendshipInvitations = _usersRepository.GetOutgoingFriendshipInvitations(userId),
             };
             foreach (var item in model.Friends)
-            {
-                item.UserPageLink = $"/User{item.Id}";
-                item.ChatId = _socialNetworkRepository.GetUsersDialog(userId, item.Id)?.Id;
-            }
-            foreach (var item in model.IncomingFriendshipInvitations)
-            {
-                item.UserPageLink = $"/User{item.Id}";
-                item.ChatId = _socialNetworkRepository.GetUsersDialog(userId, item.Id)?.Id;
-            }
-            foreach (var item in model.OutgoingFriendshipInvitations)
             {
                 item.UserPageLink = $"/User{item.Id}";
                 item.ChatId = _socialNetworkRepository.GetUsersDialog(userId, item.Id)?.Id;
@@ -218,17 +207,8 @@ namespace SocialNetwork.Controllers
         }
 
         [HttpPost]
-        public IActionResult FilterUsers(UsersFilter filter)/*string Name, string CityName, string CountryName, int? StartAge, int? EndAge)*/
+        public IActionResult FilterUsers(UsersFilter filter)
         {
-            // = new UsersFilter()
-            //{
-            //    Name = Name,
-            //    CityName = CityName,
-            //    CountryName= CountryName,
-            //    StartAge = StartAge,
-            //    EndAge = EndAge
-            //};
-            //, string Name, string CityName, string Country, int? StartAge, int? EndAge
             string userId = _userManager.GetUserId(User);
             List<NetworkUser> users = _usersRepository.FilterUsers(filter, userId);
             List<ExtendedUserViewModel> filteredUsers = new List<ExtendedUserViewModel>(users.Count);

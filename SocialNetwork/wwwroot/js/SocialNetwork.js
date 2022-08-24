@@ -31,14 +31,18 @@ async function init() {
         socNetData = await response.json();
         socNetData.friends.forEach(friend => comradesArea.appendChild(CreateUserListItem(friend, onChatSelected, onMessageSend)));
         socNetData.chats.forEach(chat => collectivesArea.appendChild(CreateGroupChatListItem(chat, onChatSelected, onMessageSend)));
-        /*if (Headers.has("chatId"))*/ {
-            var inputChatId = window.Headers.get("chatId");
-            inputChatBut = document.getElementById("chat" + inputChatId);
-            inputChatBut.click();
+
+        let savedChatId = sessionStorage.getItem("currentChatId");
+        if (savedChatId) {
+            InitialSelectChat(savedChatId);
         }
-        
     }
 
+}
+function InitialSelectChat(chatId) {
+    var chatBut = document.getElementById("chat" + chatId);
+    chatBut.parentElement.parentElement.parentElement.parentElement.parentElement.previousElementSibling.firstElementChild.click();
+    chatBut.click();
 }
 window.addEventListener("load", init);
 
@@ -126,6 +130,8 @@ async function onChatSelected(e, actionConnect, isChatADialog, chatId) {
 
     currentChatId = chatId;
 
+    sessionStorage.setItem("currentChatId", currentChatId);
+
     var response = await fetch(urlConnect + queryString, {
         method: "GET"
     })
@@ -140,32 +146,18 @@ async function onChatSelected(e, actionConnect, isChatADialog, chatId) {
 document.getElementById("applyFilter").addEventListener("click", async (e) => {
     e.preventDefault();
 
-    var elements = filterForm.elements;
     var controller = "/SocialNetwork/";
 
     var formData = new FormData(filterForm);
-    //formData.append("Name", elements.Name.value);
-    //formData.append("CityName", elements.CityName.value);
-    //formData.append("CountryName", elements.CountryName.value);
-    //formData.append("StartAge", parseInt(elements.StartAge.value));
-    //formData.append("EndAge", parseInt(elements.EndAge.value));
 
-    var jsonData = JSON.stringify({
-        Name: elements.Name.value,
-        CityName: elements.CityName.value,
-        CountryName: elements.CountryName.value,
-        StartAge: parseInt(elements.StartAge.value),
-        EndAge: parseInt(elements.EndAge.value)
-    });
     var urlConnect = location.origin + controller + "FilterUsers";
     var response = await fetch(urlConnect, {
         method: "POST",
-        body: jsonData
+        body: formData
     });
     var filteredUsersWrap = document.getElementById("filteredUsersWrap");
 
     var result = await response.text();
-    //$("@rightSide").append(result);
     filteredUsersWrap.innerHTML = "";
     var downloadedPartialView = new DOMParser().parseFromString(result, "text/html").getElementById("filteredUsers");
     var partialView;
