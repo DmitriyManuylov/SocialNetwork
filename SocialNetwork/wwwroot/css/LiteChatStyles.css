@@ -1,41 +1,24 @@
 ﻿
 #chatBlock {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    --chat-header-height: 50px;
-    padding-top: var(--chat-header-height);
 }
 
 
 #chatHeader {
     color: darkslategrey;
-    position: absolute;
     top: 0;
     width: 100%;
-    margin-top: var(--header-height);
     margin-bottom: 0;
-    height: var(--chat-header-height);
 }
-
-
-.network-dialog {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    z-index: 15;
-}
-#createRoomDialog { 
-    width: 300px;
-    height:100px;
-}
-
 
 #liteChat {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    height: 100%;
+    height: calc(100% - 38.4px);
 }
 
 

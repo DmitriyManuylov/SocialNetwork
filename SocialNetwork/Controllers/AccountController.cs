@@ -35,6 +35,10 @@ namespace SocialNetwork.Controllers
         [AllowAnonymous]
         public IActionResult Register()
         {
+            if (_signInManager.IsSignedIn(User))
+            {
+                return RedirectToAction(nameof(SocialNetworkController.Index), nameof(SocialNetworkController).Replace("Controller", ""));
+            }
             return View();
         }
 
@@ -95,6 +99,7 @@ namespace SocialNetwork.Controllers
                 user.BirthDate = model.BirthDate;
                 user.SetAge();
             }
+            user.Gender = model.Gender;
             return RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", ""));
             
             
@@ -104,6 +109,10 @@ namespace SocialNetwork.Controllers
         [AllowAnonymous]
         public IActionResult Login()
         {
+            if (_signInManager.IsSignedIn(User))
+            {
+                return RedirectToAction(nameof(SocialNetworkController.Index), nameof(SocialNetworkController).Replace("Controller", ""));
+            }
             return View();
         }
 
@@ -174,6 +183,7 @@ namespace SocialNetwork.Controllers
                 Email = user.Email,
                 BirthDate = user.BirthDate,
                 City = user.City?.Name,
+                Gender = user.Gender,
                 Country = user.Country?.Name,
             };
             return View(model);
@@ -218,6 +228,7 @@ namespace SocialNetwork.Controllers
                 user.BirthDate = model.BirthDate;
                 user.SetAge();
             }
+            user.Gender = model.Gender;
             _usersRepository.UpdateUser(user);
             return RedirectToAction(nameof(Index),nameof(SocialNetworkController).Replace("Controller",""));
         }

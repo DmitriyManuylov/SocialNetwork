@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -111,7 +110,7 @@ namespace SocialNetwork
 
                 endpoints.MapControllerRoute(
                     name: "",
-                    pattern: "{controller}/{action}/{interlocutorId:guid}");
+                    pattern: "{controller}/{action}/{calledUserId:guid}");
 
                 endpoints.MapControllerRoute(
                     name: "default",

@@ -9,5 +9,6 @@ namespace SocialNetwork.Models.UserInfoModels
         public string CountryName { get; set; }
         public int? StartAge { get; set; }
         public int? EndAge { get; set; }
+        public Gender Gender { get; set; }
     }
 }

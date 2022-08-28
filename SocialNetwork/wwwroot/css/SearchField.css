@@ -1,0 +1,20 @@
+﻿
+#userInfoWrap {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+#userInfo {
+    padding: 3px 5px;
+    background-color: white;
+}
+.user-page-row {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .user-page-row div:first-child {
+        margin-right: 10px;
+    }

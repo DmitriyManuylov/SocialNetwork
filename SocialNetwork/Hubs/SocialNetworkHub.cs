@@ -8,8 +8,11 @@ namespace SocialNetwork.Hubs
     public interface ISocialNetworkHubClient
     {
         Task ChatNotifyAsync(string message, string dateTime);
-        Task FriendshipAccepted(string userIsInvitedId);
-        Task FriendshipRequested(string invitorId);
+        Task FriendshipAccepted(UserViewModel userIsInvited);
+        Task FriendshipRequested(UserViewModel invitor);
+        Task FriendshipRejected(UserViewModel invitor);
+        Task DeletedByUserFromFriends(UserViewModel initiator);
+        Task ChatCreated(ChatViewModel chatViewModel);
         Task MessageRecieved(ChatMessageViewModel message);
     }
     [Authorize]

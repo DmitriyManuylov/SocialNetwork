@@ -3,5 +3,6 @@
     public class InterlocutorViewModel: UserViewModel
     {
         public int? ChatId { get; set; }
+
     }
 }

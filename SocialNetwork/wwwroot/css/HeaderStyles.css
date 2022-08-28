@@ -21,9 +21,10 @@ body {
 }
 
 #networkBody {
-    width: 100%;
     height: 100%;
     padding-top: var(--header-height);
+    display: flex;
+    flex-direction: row;
 }
 
 #networkHeader {
@@ -39,6 +40,17 @@ body {
     box-shadow: 0 3px 3px 3px rgb(146, 143, 143, 0.8);
     justify-content: space-between;
     height: var(--header-height);
+}
+
+
+#headerLinksWrap{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+#navigation{
+    margin-left: 30px;
 }
 
 #networkHeaderLink {
@@ -58,6 +70,9 @@ body {
 
 
 #networkHeaderLogin {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
     #networkHeaderLogin a {
@@ -75,10 +90,13 @@ body {
             background-color: slategrey;
             text-decoration: none;
         }
-.social-links {
-    text-align:center;
-    width: 500px;
+
+#butSocialLinks {
+    margin-right: 30px;
+    display: inline;
 }
-#socialLinks {
-    position:static;
+.header-menu {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }

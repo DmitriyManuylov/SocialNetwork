@@ -7,6 +7,9 @@
     ViewBag.Title = "Редактирование личных данных";
     Layout = "_MainLayout";
 }
+@section Styles {
+    <link rel="stylesheet" href="/css/LoginStyles.min.css"/>
+}
 <div class="align-items-center flex-container flex-column">
     <div class="text-danger w-25" asp-validation-summary="All"></div>
     <form id="registerForm" asp-controller="Account" asp-action="EditUserData" method="post" class="w-25">
@@ -34,6 +37,23 @@
             <label asp-for="BirthDate"></label>
             <div><span asp-validation-for="BirthDate" class="text-danger"></span></div>
             <input asp-for="BirthDate" class="form-control" />
+        </div>
+        <label>Пол</label>
+        <div class="gender-left-padding">
+
+            <div class="form-group">
+                    <input asp-for="Gender" id="GenderNotSpecified" type="radio" value="@Gender.NotSpecified" />
+                <label for="GenderNotSpecified">Не указан</label>
+            </div>
+            <div class="form-group">
+                <input asp-for="Gender" id="GenderMale" type="radio" value="@Gender.Male"/>
+                <label for="GenderMale">Мужской</label>
+            </div>
+            <div class="form-group">
+                    <input asp-for="Gender" id="GenderFemale" type="radio" value="@Gender.Female" />
+                <label for="GenderFemale">Женский</label>
+            </div>
+            
         </div>
         <div class="form-group">
             <label asp-for="City"></label>

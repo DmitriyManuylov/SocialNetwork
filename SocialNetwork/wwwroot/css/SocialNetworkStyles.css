@@ -62,11 +62,12 @@
     width: 100%;
     padding: 5px;
 }
-    #filters div div input{
+    #filters div #age input{
         width: 45%;
         display: inline;
         padding: 5px;
     }
+    
     #filters button{
         width: 100%;
     }
@@ -75,6 +76,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+#searchByGender input{
+    width: auto;
 }
 #age input{
     text-align:center;
@@ -93,12 +97,7 @@
 .no-padding {
     padding: 0;
 }
-.no-vertical-padding{
 
-}
-.no-accordion-style{
-
-}
 .no-accordion-style:focus{
     outline: 0;
     box-shadow: none;

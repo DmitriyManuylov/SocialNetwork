@@ -1,14 +1,14 @@
 ﻿
 import { CreateMessageItem, AddRoomToList } from "./HtmlGeneration.js";
 
+var userNameDialog;
 var roomsList = document.getElementById("roomsList");
-var userNameDialog = document.getElementById("userNameDialog");
-var senderNameElement = userNameDialog.children[1];
-var butSenderName = userNameDialog.children[2];
+var senderNameInput = document.getElementById("senderNameInput");
+var butSenderName = document.getElementById("butSenderName");
 var createRoomDialog = document.getElementById("createRoomDialog");
-var roomNameElement = createRoomDialog.children[1];
-var buttonCreate = createRoomDialog.children[2];
-var butShowCreateRoomDialog = document.getElementById("butCreateRoom");
+var roomNameInput = document.getElementById("roomNameInput");
+var butCreateRoom = document.getElementById("butCreateRoom");
+
 var textArea = document.getElementById("messageInput").children[0];
 var messagesArea = document.getElementById("messagesArea");
 
@@ -58,7 +58,6 @@ function init(e) {
             
             if (rooms.length != 0) {
                 FillRoomsList(rooms);
-                InitialSelectRoom();
             }
         }
     };
@@ -68,7 +67,8 @@ function init(e) {
 
 function onRoomSelect(e) {
     if (userName == "" || userName == undefined) {
-        userNameDialog.showModal();
+        userNameDialog = new bootstrap.Modal('#userNameDialog');
+        userNameDialog.show();
         return;
     }
     var connectionId = hubConnection.connectionId;
@@ -113,15 +113,8 @@ function onRoomSelect(e) {
 
 }
 
-
-function ShowCreateRoomDialog(e) {
-    createRoomDialog.showModal();
-}
-
-butShowCreateRoomDialog.addEventListener("click", ShowCreateRoomDialog);
-buttonCreate.addEventListener("click", (e) => {
-    createRoomDialog.close();
-    var roomName = roomNameElement.value;
+butCreateRoom.addEventListener("click", (e) => {
+    var roomName = roomNameInput.value;
     if (roomName == "") {
         return;
     }
@@ -148,7 +141,8 @@ function onButSendMessage(e) {
 
     if (textAreaContent.length == "") return;
     if (userName == "" || userName == undefined) {
-        userNameDialog.showModal();
+        userNameDialog = new bootstrap.Modal('#userNameDialog');
+        userNameDialog.show();
         return;
     }
     SendMessage(textAreaContent);
@@ -172,8 +166,7 @@ function SendMessage(message) {
     xhr.send(formData);
 }
 butSenderName.addEventListener("click", () => {
-    userName = senderNameElement.value;
-    userNameDialog.close();
+    userName = senderNameInput.value;
 });
 textArea.addEventListener("keypress", onButSendMessage);
 

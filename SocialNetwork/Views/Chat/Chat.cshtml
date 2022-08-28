@@ -9,41 +9,62 @@
     <link rel="stylesheet" href="/css/RoomsStyles.css" />
     <link rel="stylesheet" href="/css/ListItemsStyles.css" />
 }
-<div id="chatBlock">
-    <h2 id="chatHeader" class="text-center">Простой чат без регистрации</h2>
-    <div id="liteChat">
-        <div id="roomsWrap" class="flex-item side-bar">
-            <div id="roomsHeader" class="border-bottom-double">
-                <h3>Комнаты</h3>
-            </div>
-            <div>
-                <button id="butCreateRoom">Создать комнату</button>
-            </div>
-            <div id="roomsListWrap" class="">
-                <div id="roomsList">
-
+    
+    <div id="chatBlock">
+        <h2 id="chatHeader" class="text-center">Простой чат без регистрации</h2>
+        <div id="liteChat">
+            <div id="roomsWrap" class="flex-item side-bar">
+                <div id="roomsHeader" class="border-bottom-double">
+                    <h3>Комнаты</h3>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#createRoomDialog">Создать комнату</button>
+                </div>
+                <div id="roomsListWrap" class="">
+                    <div id="roomsList">
+                    </div>
                 </div>
             </div>
-
-        </div>
-        @await Html.PartialAsync("ChatFramePartial")
-
-        <div id="rightSide" class="flex-item side-bar">
-
+            @await Html.PartialAsync("ChatFramePartial")
+            <div id="rightSide" class="flex-item side-bar">
+            </div>
         </div>
     </div>
-</div>
-<dialog id="createRoomDialog" class="network-dialog">
-    <h2>Создание комнаты</h2>
-    <input type="text" placeholder="Название комнаты"/>
-    <button type="button">Создать</button>
-</dialog>
-<dialog id="userNameDialog" class="network-dialog">
-    <h2>Назовитесь, товарищ!</h2>
-    <input type="text" id="senderInput" placeholder="Имя пользователя"/>
-    <button type="button">Утвердить</button>
-</dialog>
-<script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
-<script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
-<script type="module" src="/js/LiteChat.js"></script>
+    <div id="createRoomDialog" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Создание комнаты</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="roomNameInput" class="w-100 h-100" type="text" placeholder="Название комнаты" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="butCreateRoom" type="button" data-bs-dismiss="modal" class="btn btn-primary">Создать</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div id="userNameDialog" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Назовитесь, товарищ!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input id="senderNameInput" class="w-100 h-100" type="text" placeholder="Имя пользователя" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="butSenderName" type="button" data-bs-dismiss="modal" class="btn btn-primary">Утвердить</button>
+                    </div>
+                </div>
+            </div>
+        </div>    
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
+    <script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
+    <script type="module" src="/js/LiteChat.js"></script>
 

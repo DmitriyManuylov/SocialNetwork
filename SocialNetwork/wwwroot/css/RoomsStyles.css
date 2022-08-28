@@ -6,20 +6,21 @@
 }
 
 #butCreateRoom {
-    width: 100%;
+
 }
 
 #roomsListWrap {
+    border: double;
+    border-color: silver;
     overflow-y: scroll;
-    height: calc(100% - 80px);
+    height: calc(100% - 87px);
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 #roomsList {
-    border: double;
-    border-color: silver;
+
     width: 100%;
 }
 

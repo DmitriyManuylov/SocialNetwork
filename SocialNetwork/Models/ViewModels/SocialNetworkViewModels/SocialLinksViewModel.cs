@@ -10,5 +10,7 @@ namespace SocialNetwork.Models.ViewModels.SocialNetworkViewModels
 
         public List<InterlocutorViewModel> Friends { get; set; }
 
+        public List<InterlocutorViewModel> Interlocutors { get; set; }
+
     }
 }

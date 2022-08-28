@@ -12,7 +12,9 @@ using SocialNetwork.Models.ViewModels.SocialNetworkViewModels;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SocialNetwork.Controllers
 {
@@ -42,57 +44,100 @@ namespace SocialNetwork.Controllers
         public IActionResult Data()
         {
             string userId = _userManager.GetUserId(User);
-
-            SocialLinksViewModel model = new SocialLinksViewModel()
+            SocialLinksViewModel model;
+            try
             {
-                Chats = _socialNetworkRepository.GetUserChats(userId),
-                Friends = _usersRepository.GetFriends(userId),
-            };
-            foreach (var item in model.Friends)
-            {
-                item.UserPageLink = $"/User{item.Id}";
-                item.ChatId = _socialNetworkRepository.GetUsersDialog(userId, item.Id)?.Id;
+                model = new SocialLinksViewModel()
+                {
+                    Chats = _socialNetworkRepository.GetUserChats(userId),
+                    Friends = _usersRepository.GetFriends(userId),
+                    Interlocutors = _usersRepository.GetInterlocutors(userId)
+                };
             }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
             return Ok(model);
         }
 
         /// <summary>
         /// Приглашение в друзья
         /// </summary>
-        /// <param name="userIsInvitedId"></param>
+        /// <param name="calledUserId"></param>
         /// <returns></returns>
-        public IActionResult InviteFriend(string userIsInvitedId)
+        public IActionResult InviteFriend(string calledUserId)
         {
             string userId = _userManager.GetUserId(User);
             try
             {
-                _usersRepository.InviteFriend(userId, userIsInvitedId);
+                _usersRepository.InviteFriend(userId, calledUserId);
             }
-            catch (ChatException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            _hubContext.Clients.User(userIsInvitedId).FriendshipRequested(userId);
+            NetworkUser user = _usersRepository.GetUserById(userId);
+            UserViewModel userViewModel = new UserViewModel()
+            {
+                Id = user.Id,
+                UserPageLink = $"User{user.Id}",
+            };
+            userViewModel.SetFullName(user);
+            _hubContext.Clients.User(calledUserId).FriendshipRequested(userViewModel);
             return Ok();
         }
 
         /// <summary>
         /// Принятие предложения дружбы
         /// </summary>
-        /// <param name="invitorId"></param>
+        /// <param name="calledUserId"></param>
         /// <returns></returns>
-        public IActionResult AcceptFriendship(string invitorId)
+        public IActionResult AcceptFriendship(string calledUserId)
         {
             string userId = _userManager.GetUserId(User);
             try
             {
-                _usersRepository.AcceptFriendship(invitorId, userId);
+                _usersRepository.AcceptFriendship(calledUserId, userId);
             }
-            catch (ChatException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            _hubContext.Clients.User(invitorId).FriendshipAccepted(userId);
+            NetworkUser user = _usersRepository.GetUserById(userId);
+            UserViewModel userViewModel = new UserViewModel()
+            {
+                Id = user.Id,
+                UserPageLink = $"User{user.Id}"
+            };
+            userViewModel.SetFullName(user);
+
+            _hubContext.Clients.User(calledUserId).FriendshipAccepted(userViewModel);
+            return Ok();
+        }
+        
+        public async Task<IActionResult> DeleteUser(string calledUserId)
+        {
+            string userId = _userManager.GetUserId(User);
+            try
+            {
+                _usersRepository.DeleteFriend(userId, calledUserId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            NetworkUser user = _usersRepository.GetUserById(userId);
+            UserViewModel userViewModel = new UserViewModel()
+            {
+                Id = user.Id,
+                UserPageLink = $"User{user.Id}"
+            };
+            userViewModel.SetFullName(user);
+
+            await _hubContext.Clients.User(calledUserId).DeletedByUserFromFriends(userViewModel);
+
             return Ok();
         }
 
@@ -106,18 +151,20 @@ namespace SocialNetwork.Controllers
         {
             string userId = _userManager.GetUserId(User);
             GroupChat chat;
+            List<ChatMessageViewModel> messages;
             try
             {
                 chat = _socialNetworkRepository.JoinToChat(chatId, userId);
+                messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
             }
-            catch (ChatException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
             NetworkUser thisUser = await _userManager.GetUserAsync(User);
             await _hubContext.Clients.Group(chat.Name).ChatNotifyAsync($"Пользователь {thisUser.UserName} присоединился к коллективу", DateTime.Now.ToString());
             await _hubContext.Groups.AddToGroupAsync(connectionId, chat.Name);
-            List<ChatMessageViewModel> messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
+           
             foreach (ChatMessageViewModel message in messages)
                 message.SenderLink = "/User" + userId;
             return Ok(messages);
@@ -138,9 +185,9 @@ namespace SocialNetwork.Controllers
             {
                 chat = _socialNetworkRepository.LeaveFromChat(chatId, userId);
             }
-            catch (ChatException ex)
+            catch (Exception)
             {
-                return BadRequest(ex.Message);
+                return BadRequest();
             }
             NetworkUser thisUser = await _userManager.GetUserAsync(User);
             await _hubContext.Clients.Group(chat.Name).ChatNotifyAsync($"Пользователь {thisUser.UserName} покинул коллектив", DateTime.Now.ToString());
@@ -151,9 +198,18 @@ namespace SocialNetwork.Controllers
         public async Task<IActionResult> ConnectToChat(int chatId, string connectionId)
         {
             string userId = _userManager.GetUserId(User);
-            GroupChat chat = _socialNetworkRepository.GetChatById(chatId);
-            List<ChatMessageViewModel> messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
-            HttpContext.Session.SetString("CurrentChatName", chat.Name);
+            GroupChat chat;
+            List<ChatMessageViewModel> messages;
+            try
+            {
+                chat = _socialNetworkRepository.GetChatById(chatId);
+                messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
             foreach (ChatMessageViewModel message in messages)
             {
                 message.SenderLink = "/User" + message.SenderId;
@@ -162,14 +218,24 @@ namespace SocialNetwork.Controllers
             await _hubContext.Groups.AddToGroupAsync(connectionId, chat.Name);
             return Ok(messages);
         }
-        public IActionResult ConnectToDialog(int chatId, string interlocutorId)
+        public IActionResult ConnectToDialog(int chatId, string calledUserId)
         {
             string userId = _userManager.GetUserId(User);
-            
-            GroupChat chat = _socialNetworkRepository.GetChatById(chatId);
-            if (!string.IsNullOrEmpty(chat.Name)) return BadRequest();
-            List<ChatMessageViewModel> messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
 
+            GroupChat chat;
+
+            List<ChatMessageViewModel> messages;
+            try
+            {
+                chat = _socialNetworkRepository.GetChatById(chatId);
+                messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+            if (!string.IsNullOrEmpty(chat.Name)) return BadRequest();
             foreach (ChatMessageViewModel message in messages)
             {
                 message.SenderLink = "/User" + message.SenderId;
@@ -180,18 +246,37 @@ namespace SocialNetwork.Controllers
         public async Task<IActionResult> DisconnectFromChat(int chatId, string connectionId)
         {
             string userId = _userManager.GetUserId(User);
-            GroupChat chat = _socialNetworkRepository.GetChatById(chatId);
+            GroupChat chat;
+            try
+            {
+                chat = _socialNetworkRepository.GetChatById(chatId);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
             await _hubContext.Groups.RemoveFromGroupAsync(connectionId, chat.Name);
-            HttpContext.Session.Remove("CurrentChatName");
+
             return Ok();
         }
 
         public IActionResult UserPage(string Id)
         {
             string userId = _userManager.GetUserId(User);
-            FriendshipFact friendshipFact = _usersRepository.GetFriendshipFact(userId, Id);
+            NetworkUser networkUser;
+            FriendshipFact friendshipFact;
+            try
+            {
+                networkUser = _usersRepository.GetUserById(Id);
+                friendshipFact = _usersRepository.GetFriendshipFact(userId, Id);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+            
             FriendshipFactStates friendshipFactState = FriendshipFactStates.Friends;
-            NetworkUser networkUser = _usersRepository.GetUserById(Id);
             if (friendshipFact == null) friendshipFactState = FriendshipFactStates.NotFriends;
             else
             {
@@ -210,33 +295,35 @@ namespace SocialNetwork.Controllers
         public IActionResult FilterUsers(UsersFilter filter)
         {
             string userId = _userManager.GetUserId(User);
-            List<NetworkUser> users = _usersRepository.FilterUsers(filter, userId);
-            List<ExtendedUserViewModel> filteredUsers = new List<ExtendedUserViewModel>(users.Count);
+            List<NetworkUser> users;
+            List<ExtendedUserViewModel> filteredUsers;
+            try
+            {
+                users = _usersRepository.FilterUsers(filter, userId);
+                filteredUsers = new List<ExtendedUserViewModel>(users.Count);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+            
             foreach (NetworkUser user in users)
             {
                 ExtendedUserViewModel createdModelItem = new ExtendedUserViewModel()
                 {
                     Id = user.Id,
                     UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.Surname,
                     BirthDate = user.BirthDate,
+                    Gender = user.Gender,
                     Age = user.Age,
                     Email = user.Email,
                     UserPageLink = $"User{user.Id}",
                     CityName = user.City?.Name,
                     CountryName = user.Country?.Name,
                 };
-                string fullName;
-                if (!string.IsNullOrEmpty(user.FirstName))
-                {
-                    fullName = user.FirstName;
-                    if (!string.IsNullOrEmpty(user.Surname))
-                        fullName += " " + user.Surname;
-                    fullName += $"({user.UserName})";
-                }
-                else 
-                    fullName = user.UserName;
 
-                createdModelItem.UserName = fullName;
                 filteredUsers.Add(createdModelItem);
             }
 
@@ -248,7 +335,17 @@ namespace SocialNetwork.Controllers
         {
             string userId = _userManager.GetUserId(User);
             NetworkUser thisUser = await _userManager.GetUserAsync(User);
-            Message message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(thisUser.Id, text, chatId));
+
+            Message message;
+            try
+            {
+                message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(thisUser.Id, text, chatId));
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+           
             ChatMessageViewModel viewModel = new ChatMessageViewModel()
             {
                 ChatId = chatId,
@@ -262,19 +359,37 @@ namespace SocialNetwork.Controllers
             return Ok();
         }
 
-        public IActionResult GetDialogId(string interlocutorId)
+        public IActionResult GetDialogId(string calledUserId)
         {
             string userId = _userManager.GetUserId(User);
-            GroupChat chat = _socialNetworkRepository.EnsureGetUsersDialog(userId, interlocutorId);
-            object obj = new { chatId = chat.Id };
+            GroupChat chat;
+            try
+            {
+                chat = _socialNetworkRepository.EnsureGetUsersDialog(userId, calledUserId);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+             
             return Ok(chat.Id);
         }
-        public async Task<IActionResult> SendMessageToInterlocutor(int chatId, string text, string interlocutorId)
+        public async Task<IActionResult> SendMessageToInterlocutor(int chatId, string text, string calledUserId)
         {
             string userId = _userManager.GetUserId(User);
             NetworkUser thisUser = await _userManager.GetUserAsync(User);
-            GroupChat chat = _socialNetworkRepository.GetChatById(chatId);
-            Message message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(userId, text, chatId));
+            GroupChat chat;
+            Message message;
+            try
+            {
+                chat = _socialNetworkRepository.GetChatById(chatId);
+                message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(userId, text, chatId));
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+            
             ChatMessageViewModel viewModel = new ChatMessageViewModel()
             {
                 ChatId = chatId,
@@ -284,7 +399,8 @@ namespace SocialNetwork.Controllers
                 DateTime = message.DateTime.ToString("f"),
                 SenderLink = $"/User{userId}"
             };
-            await _hubContext.Clients.Users(userId, interlocutorId).MessageRecieved(viewModel);
+            await _hubContext.Clients.Users(userId, calledUserId).MessageRecieved(viewModel);
+
             return Ok();
         }
     }

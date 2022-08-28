@@ -45,12 +45,38 @@
                 </div>
             }
         </div>
-        @if (Model.User.Age.HasValue)
-        {
+        <div class="flex-container flex-row user-page-row">
+            @if (Model.User.Age.HasValue)
+            {
+                <div>
+                    Возраст: @Model.User.Age
+                </div>
+            }
             <div>
-                Возраст: @Model.User.Age
+                @{
+                    string gender = "";
+                    switch (Model.User.Gender){
+                        case Gender.NotSpecified:
+                            {
+                                gender = "Не указан";
+                                break;
+                            }
+                        case Gender.Male:
+                            {
+                                gender = "Мужской";
+                                break;
+                            }
+                        case Gender.Female:
+                            {
+                                gender = "Женский";
+                                break;
+                            }
+                    }
+                    <text>Пол: @gender</text>
+                }
+                
             </div>
-        }
+        </div>
         
         @if (!string.IsNullOrEmpty(Model.User.Email))
         {
@@ -58,34 +84,35 @@
                 Электронная почта: @Model.User.Email
             </div>
         }
+
         @if (Model.User.Id != user.Id)
         {
-            <div>
+            <div class="flex-container flex-row user-page-row">
                 @switch (Model.FriendshipFactState)
                 {
                     case FriendshipFactStates.NotFriends:
                         {
-                            <button id="Invite">Пригласить</button>
+                            <button class="btn btn-outline-secondary" id="butInvite">Пригласить</button>
                             break;
                         }
                     case FriendshipFactStates.IncomingInvitation:
                         {
-                            <button id="Accept">Принять приглашение</button>
+                            <button class="btn btn-outline-secondary" id="butAccept">Принять приглашение</button>
                             break;
                         }
                     case FriendshipFactStates.OutgoingInvitation:
                         {
-                            <text>Отправлено приглашение</text>
+                            <label>Отправлено приглашение</label>
                             break;
                         }
                     case FriendshipFactStates.Friends:
                         {
-                            <text>Вы состоите в дружбе</text>
+                            <label>Вы состоите в дружбе</label>
                             break;
                         }
                 }
 
-                <button type="submit" id="SendMessageBut" class="btn btn-outline-primary">
+                <button type="submit" id="SendMessageBut" class="btn btn-outline-secondary">
                     Написать сообщение
                 </button>
             </div>
@@ -94,7 +121,5 @@
     </div>
 </div>
 @section Scripts{
-    <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js"></script>
-    <script src="~/lib/microsoft/signalr-protocol-msgpack/dist/browser/signalr-protocol-msgpack.min.js"></script>
     <script src="~/js/UserPage.js"></script>
 }

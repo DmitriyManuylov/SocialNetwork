@@ -7,6 +7,9 @@
     ViewBag.Title = "Регистрация";
     Layout = "_MainLayout";
 }
+@section Styles{
+    <link rel="stylesheet" href="~/css/LoginStyles.min.css"/>
+}
 <div class="align-items-center flex-container flex-column">
     <div class="text-danger w-25" asp-validation-summary="All"></div>
     <form id="registerForm" asp-action="Register" asp-controller="Account" method="post" class="w-25">
@@ -37,22 +40,23 @@
             <div><span asp-validation-for="BirthDate" class="text-danger"></span></div>
             <input asp-for="BirthDate" class="form-control"/>
         </div>
-        <div class="form-group">
-            <label asp-for="Gender"></label>
-            <div><span asp-validation-for="Gender" class="text-danger"></span></div>
-            <input type="radio" checked="checked" id="Gender" name="Gender" value="@Gender.NotSpecified" />
-            <span>Не указан</span>
-        </div>
-        <div class="form-group">
-            <div><span asp-validation-for="Gender" class="text-danger"></span></div>
-            <input type="radio" id="Gender" name="Gender"value="@Gender.Male" />
-            <span>Мужской</span>
-        </div>
-        <div class="form-group">
-            <div><span asp-validation-for="Gender" class="text-danger"></span></div>
-            <input type="radio" id="Gender" name="Gender"value="@Gender.Female" />
-            <span>Женский</span>
-        </div>
+
+            <label>Пол</label>
+            <div class="gender-left-padding">
+
+                <div class="form-group">
+                    <input type="radio" checked="checked" id="GenderNotSpecified" name="Gender" value="@Gender.NotSpecified" />
+                    <label for="GenderNotSpecified">Не указан</label>
+                </div>
+                <div class="form-group">
+                    <input type="radio" id="GenderMale" name="Gender" value="@Gender.Male" />
+                    <label for="GenderMale">Мужской</label>
+                </div>
+                <div class="form-group">
+                    <input type="radio" id="GenderFemale" name="Gender" value="@Gender.Female" />
+                    <label for="GenderFemale">Женский</label>
+                </div>
+            </div>
         <div class="form-group">
             <label asp-for="City"></label>
             <div><span asp-validation-for="City" class="text-danger"></span></div>

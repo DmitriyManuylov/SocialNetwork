@@ -3,6 +3,7 @@ using SocialNetwork.Models.ChatModels;
 using SocialNetwork.Models.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace SocialNetwork.Models.UserInfoModels
@@ -67,8 +68,11 @@ namespace SocialNetwork.Models.UserInfoModels
 
     public enum Gender
     {
+        [Display(Name = "Не указан")]
         NotSpecified,
+        [Display(Name = "Мужской")]
         Male,
+        [Display(Name = "Женский")]
         Female
     }
 }

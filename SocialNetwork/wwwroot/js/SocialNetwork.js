@@ -21,6 +21,7 @@ function onMessageRecieved(message) {
 }
 var comradesArea = document.getElementById("comradesArea");
 var collectivesArea = document.getElementById("collectivesArea");
+var interlocutorsArea = document.getElementById("interlocutorsArea");
 var messagesArea = document.querySelector("#messagesArea");
 
 async function init() {
@@ -31,6 +32,7 @@ async function init() {
         socNetData = await response.json();
         socNetData.friends.forEach(friend => comradesArea.appendChild(CreateUserListItem(friend, onChatSelected, onMessageSend)));
         socNetData.chats.forEach(chat => collectivesArea.appendChild(CreateGroupChatListItem(chat, onChatSelected, onMessageSend)));
+        socNetData.interlocutors.forEach(int => interlocutorsArea.appendChild(CreateUserListItem(int, onChatSelected, onMessageSend)));
 
         let savedChatId = sessionStorage.getItem("currentChatId");
         if (savedChatId) {
@@ -41,8 +43,11 @@ async function init() {
 }
 function InitialSelectChat(chatId) {
     var chatBut = document.getElementById("chat" + chatId);
-    chatBut.parentElement.parentElement.parentElement.parentElement.parentElement.previousElementSibling.firstElementChild.click();
-    chatBut.click();
+    if (chatBut) {
+        chatBut.parentElement.parentElement.parentElement.parentElement.parentElement.previousElementSibling.firstElementChild.click();
+        chatBut.click();
+    }
+    
 }
 window.addEventListener("load", init);
 
@@ -84,7 +89,7 @@ async function onMessageSend(e, action, chatId) {
     formData.append("text", message);
     var url = location.origin + controller + action + "/" + chatId;
     if (action == "SendMessageToInterlocutor") {
-        formData.append("interlocutorId", currentChatbut.parentElement.children[2].value);
+        formData.append("calledUserId", currentChatbut.parentElement.children[2].value);
     }
     var response = await fetch(url, {
         method: "POST",
@@ -98,7 +103,7 @@ async function onMessageSend(e, action, chatId) {
 
 
 async function onChatSelected(e, actionConnect, isChatADialog, chatId) {
-    if (chatId == currentChatId) return;
+    if (chatId == currentChatId && chatId != null) return;
     messagesArea.innerHTML = "";
     var queryString = "?" + "connectionId=" + hubConnection.connectionId;
     var controller = "/SocialNetwork/";
@@ -168,4 +173,5 @@ document.getElementById("applyFilter").addEventListener("click", async (e) => {
         partialView.innerText = "Не найдено ни одного пользователя";
     }
     filteredUsersWrap.appendChild(partialView);
+    document.getElementById("butSearchUsers").click();
 });

@@ -16,4 +16,11 @@
 .user-page-row{
     width: 100%;
     justify-content: space-between;
+    align-items: center;
 }
+    .user-page-row div:first-child {
+        margin-right: 50px;
+    }
+    .user-page-row :first-child{
+        margin-right: 50px;
+    }

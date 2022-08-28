@@ -1,5 +1,4 @@
 [
-  
   {
     "outputFileName": "wwwroot/css/ListItemsStyles.min.css",
     "inputFiles": [
@@ -64,6 +63,42 @@
     "outputFileName": "wwwroot/css/HeaderStyles.min.css",
     "inputFiles": [
       "wwwroot/css/HeaderStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/AppStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/AppStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/SearchField.min.css",
+    "inputFiles": [
+      "wwwroot/css/SearchField.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/SocialNetworkStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/SocialNetworkStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/UserPageStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/UserPageStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/UserPage.min.js",
+    "inputFiles": [
+      "wwwroot/js/UserPage.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/js/SocNetHtmlGen.min.js",
+    "inputFiles": [
+      "wwwroot/js/SocNetHtmlGen.js"
     ]
   }
 ]

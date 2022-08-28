@@ -4,24 +4,31 @@
 @{
 
 }
-<div id="socialLinks" class="dropdown-center">
+<div id="butSocialLinks" class="dropdown-center">
     <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         Приглашения
     </button>
     <div class="dropdown-menu social-links">
         <div>
-            <div>
-                <h3>
+            <div id="incomingInvitations">
+                <h5>
                     Входящие приглашения
-                </h3>
+                </h5>
                 <div>
+                    @foreach(var item in Model.IncomingInvitations){
+                        <a class="user-link w-100" asp-controller="SocialNetwork" asp-action="UserPage" asp-route-Id="@item.Id">@item.UserName</a>
+                    }
                 </div>
             </div>
-            <div>
-                <h3>
+            <div id="outgoingInvitations">
+                <h5>
                     Исходящие приглашения
-                </h3>
+                </h5>
                 <div>
+                    @foreach (var item in Model.OutgoingInvitations)
+                    {
+                        <a class="user-link w-100" asp-controller="SocialNetwork" asp-action="UserPage" asp-route-Id="@item.Id">@item.UserName</a>
+                    }
                 </div>
             </div>
         </div>

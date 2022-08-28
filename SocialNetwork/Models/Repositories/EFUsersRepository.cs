@@ -66,13 +66,17 @@ namespace SocialNetwork.Models.Repositories
             if (!string.IsNullOrEmpty(usersFilter.Name))
             {
                 string[] nameParts = usersFilter.Name.Split(' ');
-                if (nameParts.Length == 1) users = users.Where(user => EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%"));
+                if (nameParts.Length == 1) users = users.Where(user => EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%")
+                                                                           ||
+                                                                       EF.Functions.Like(user.Surname, $"%{nameParts[0]}%"));
+
+                else 
                 if (nameParts.Length == 2) users = users.Where(user => (EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%")
-                                                                            &&
+                                                                           &&
                                                                         EF.Functions.Like(user.Surname, $"%{nameParts[1]}%"))
-                                                                            ||
-                                                                        (EF.Functions.Like(user.FirstName, $"%{nameParts[1]}%")
-                                                                            &&
+                                                                           ||
+                                                                       (EF.Functions.Like(user.FirstName, $"%{nameParts[1]}%")
+                                                                           &&
                                                                         EF.Functions.Like(user.Surname, $"%{nameParts[0]}%")));
             }
             if (usersFilter.StartAge.HasValue)
@@ -84,7 +88,10 @@ namespace SocialNetwork.Models.Repositories
             {
                 users = users.Where(user => user.Age <= usersFilter.EndAge);
             }
-
+            if (usersFilter.Gender != Gender.NotSpecified)
+            {
+                users = users.Where(user => user.Gender == usersFilter.Gender);
+            }
             var result = users.ToList();
             return result;
 
@@ -141,7 +148,7 @@ namespace SocialNetwork.Models.Repositories
         /// <param name="invitorId"></param>
         /// <param name="invitedId"></param>
         /// <exception cref="FriendshipException"></exception>
-        public void InviteFriend(string invitorId, string invitedId)
+        public NetworkUser InviteFriend(string invitorId, string invitedId)
         {
             NetworkUser invitor = _dbContext.Users.Include(user => user.FriendshipFactsOut)
                                                   .Include(user => user.FriendshipFactsIn)
@@ -151,9 +158,14 @@ namespace SocialNetwork.Models.Repositories
                                                   .FirstOrDefault(dbUser => dbUser.Id == invitedId);
             if (invitor == null) throw new FriendshipException("Приглашающий не существует");
             if (invited == null) throw new FriendshipException("Приглашаемый не существует");
+
             FriendshipFact friendshipFactOut = invitor.FriendshipFactsOut.FirstOrDefault(fact => fact.InitiatorId == invitorId && fact.InvitedId == invitedId);
             FriendshipFact friendshipFactIn = invitor.FriendshipFactsOut.FirstOrDefault(fact => fact.InitiatorId == invitedId && fact.InvitedId == invitorId);
+
+            if (friendshipFactIn != null && !friendshipFactIn.RequestAccepted) throw new FriendshipException("Инициатор уже приглашен");
+            if (friendshipFactOut != null && !friendshipFactOut.RequestAccepted) throw new FriendshipException("Инициатор повторно приглашает пользователя");
             if (friendshipFactIn != null || friendshipFactOut != null) throw new FriendshipException("Пользователи уже состоят в дружбе");
+
             FriendshipFact friendshipFact = new FriendshipFact()
             {
                 InitiatorId = invitorId,
@@ -164,6 +176,7 @@ namespace SocialNetwork.Models.Repositories
             };
             _dbContext.FriendshipFacts.Add(friendshipFact);
             _dbContext.SaveChanges();
+            return invited;
         }
         /// <summary>
         /// 
@@ -171,7 +184,7 @@ namespace SocialNetwork.Models.Repositories
         /// <param name="invitorId"></param>
         /// <param name="invitedId"></param>
         /// <exception cref="FriendshipException"></exception>
-        public void AcceptFriendship(string invitorId, string invitedId)
+        public NetworkUser AcceptFriendship(string invitorId, string invitedId)
         {
             NetworkUser invitor = _dbContext.Users.Include(user => user.FriendshipFactsOut)
                                                   .Include(user => user.FriendshipFactsIn)
@@ -183,30 +196,93 @@ namespace SocialNetwork.Models.Repositories
             if (invited == null) throw new FriendshipException("Приглашаемый не существует");
 
             FriendshipFact friendshipFactIn = invited.FriendshipFactsIn.FirstOrDefault(fact => fact.InitiatorId == invitorId && fact.InvitedId == invitedId);
+            FriendshipFact friendshipFactOut = invited.FriendshipFactsOut.FirstOrDefault(fact => fact.InitiatorId == invitedId && fact.InvitedId == invitorId);
+
+            if (friendshipFactOut != null) throw new FriendshipException("Приглашение отплавлено данным пользователем(принимать должен второй пользователь)");
             if (friendshipFactIn == null) throw new FriendshipException("Приглашение дружить не поступало");
             if (friendshipFactIn.RequestAccepted) throw new FriendshipException("Приглашение о дружбе уже было принято");
-            friendshipFactIn.DateOfConclusion = DateTime.UtcNow;
+
+            friendshipFactIn.DateOfConclusion = DateTime.Now;
             friendshipFactIn.RequestAccepted = true;
             _dbContext.SaveChanges();
+            return invitor;
         }
+        public NetworkUser DeleteFriend(string userId, string friendId)
+        {
+            NetworkUser user = _dbContext.Users.FirstOrDefault(user => user.Id == userId);
+            if (user == null) throw new NetworkUserException("Пользователь не существует");
+            NetworkUser friend = _dbContext.Users.FirstOrDefault(user => user.Id == friendId);
+            if (friend == null) throw new NetworkUserException("Удаляемый из друзей пользователь не существует");
 
+            var friendshipFactQuery = from ff in _dbContext.FriendshipFacts
+                                      where (ff.InitiatorId == userId && ff.InvitedId == friendId)
+                                          ||
+                                      (ff.InvitedId == userId && ff.InitiatorId == friendId)
+                                      select ff;
+            var friendshipFact = friendshipFactQuery.FirstOrDefault();
+            if (friendshipFact == null) throw new FriendshipException("Пользователи не состоят в дружбе");
+            _dbContext.FriendshipFacts.Remove(friendshipFact);
+            _dbContext.SaveChanges();
+            return friend;
+        }
         public List<InterlocutorViewModel> GetFriends(string userId)
         {
-            IQueryable<InterlocutorViewModel> friendsIn = from user in _dbContext.Users
-                                                  join ff in _dbContext.FriendshipFacts on user.Id equals ff.InitiatorId
-                                                  where ff.InvitedId == userId && ff.RequestAccepted == true
-                                                  select new InterlocutorViewModel { Id = user.Id, UserName = user.UserName };
-            IQueryable<InterlocutorViewModel> friendsOut = from user in _dbContext.Users
-                                                  join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
-                                                  where ff.InitiatorId == userId && ff.RequestAccepted == true
-                                                  select new InterlocutorViewModel { Id = user.Id, UserName = user.UserName };
+            IQueryable<string> friendsIn = from user in _dbContext.Users
+                                                          join ff in _dbContext.FriendshipFacts on user.Id equals ff.InitiatorId
+                                                          where ff.InvitedId == userId && ff.RequestAccepted == true
+                                                          select ff.InitiatorId;
 
-            List<InterlocutorViewModel> friendsList = friendsIn.ToList();
-            List<InterlocutorViewModel> friendsOutList = friendsOut.ToList();
+            IQueryable<string> friendsOut = from user in _dbContext.Users
+                                                           join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
+                                                           where ff.InitiatorId == userId && ff.RequestAccepted == true
+                                                           select ff.InvitedId;
 
-            friendsList.AddRange(friendsOutList);
-            return friendsList;
+            IQueryable<InterlocutorViewModel> friends = from _user in _dbContext.Users
+
+                                                         where friendsIn.Contains(_user.Id)
+                                                                  ||
+                                                                friendsOut.Contains(_user.Id)
+
+                                                         select new InterlocutorViewModel
+                                                         {
+                                                             Id = _user.Id,
+                                                             UserName = _user.UserName,
+                                                             UserPageLink = $"/User{_user.Id}"
+                                                         };
+
+            return friends.ToList();
         }
+
+        public List<InterlocutorViewModel> GetInterlocutors(string userId)
+        {
+            IQueryable<string> friendsIn = from user in _dbContext.Users
+                                                          join ff in _dbContext.FriendshipFacts on user.Id equals ff.InitiatorId
+                                                          where ff.InvitedId == userId && ff.RequestAccepted == true
+                                                          select user.Id;
+            IQueryable<string> friendsOut = from user in _dbContext.Users
+                                                           join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
+                                                           where ff.InitiatorId == userId && ff.RequestAccepted == true
+                                                           select user.Id;
+            IQueryable<InterlocutorViewModel> interlocutors = from user in _dbContext.Users
+                                                              join mic in _dbContext.MembershipInChats on user.Id equals mic.UserId
+                                                              where
+                                                              (from chat in _dbContext.Chats
+                                                               join userMic in _dbContext.MembershipInChats on chat.Id equals userMic.ChatId
+                                                               where userMic.UserId == userId && chat.Name == ""
+                                                               select chat.Id).Contains(mic.ChatId) && user.Id != userId && !friendsIn.Contains(user.Id) && !friendsOut.Contains(user.Id)
+                                                              select new InterlocutorViewModel()
+                                                              {
+                                                                  Id = user.Id,
+                                                                  ChatId = mic.ChatId,
+                                                                  UserName = user.UserName,
+                                                                  UserPageLink = $"/User{user.Id}"
+                                                              };
+
+            var result = interlocutors.ToList(); 
+            return result;
+        }
+
+
 
         public List<InterlocutorViewModel> GetIncomingFriendshipInvitations(string userId)
         {
