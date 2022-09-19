@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Models.ChatModels;
 using SocialNetwork.Models.Exceptions;
 using SocialNetwork.Models.UserInfoModels;
-using SocialNetwork.Models.ViewModels.SocialNetworkViewModels;
+using SocialNetwork.Models.ViewModels.UsersViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -204,6 +205,13 @@ namespace SocialNetwork.Models.Repositories
 
             friendshipFactIn.DateOfConclusion = DateTime.Now;
             friendshipFactIn.RequestAccepted = true;
+            Dialog dialog = _dbContext.Dialogs.Where(dialog => (dialog.User1Id == invitorId && dialog.User2Id == invited.Id) 
+                                                                    ||
+                                                              (dialog.User2Id == invitorId && dialog.User1Id == invited.Id))
+                                                .FirstOrDefault();
+            if (dialog != null)
+                friendshipFactIn.DialogId = dialog.Id;
+
             _dbContext.SaveChanges();
             return invitor;
         }
@@ -227,58 +235,82 @@ namespace SocialNetwork.Models.Repositories
         }
         public List<InterlocutorViewModel> GetFriends(string userId)
         {
-            IQueryable<string> friendsIn = from user in _dbContext.Users
-                                                          join ff in _dbContext.FriendshipFacts on user.Id equals ff.InitiatorId
+            IQueryable<InterlocutorViewModel> friendsIn = from user in _dbContext.Users
+                                                          join ff in _dbContext.FriendshipFacts.Include(ff => ff.Dialog) on user.Id equals ff.InitiatorId
                                                           where ff.InvitedId == userId && ff.RequestAccepted == true
-                                                          select ff.InitiatorId;
+                                                          select new InterlocutorViewModel
+                                                          {
+                                                              Id = user.Id,
+                                                              ChatId = ff.Dialog.ChatId,
+                                                              UserName = user.UserName
+                                                          }; 
 
-            IQueryable<string> friendsOut = from user in _dbContext.Users
-                                                           join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
+            IQueryable<InterlocutorViewModel> friendsOut = from user in _dbContext.Users
+                                                           join ff in _dbContext.FriendshipFacts.Include(ff => ff.Dialog) on user.Id equals ff.InvitedId
                                                            where ff.InitiatorId == userId && ff.RequestAccepted == true
-                                                           select ff.InvitedId;
+                                                           select new InterlocutorViewModel
+                                                           {
+                                                               Id = user.Id,
+                                                               ChatId = ff.Dialog.ChatId,
+                                                               UserName = user.UserName
+                                                           };
 
-            IQueryable<InterlocutorViewModel> friends = from _user in _dbContext.Users
-
-                                                         where friendsIn.Contains(_user.Id)
-                                                                  ||
-                                                                friendsOut.Contains(_user.Id)
-
-                                                         select new InterlocutorViewModel
-                                                         {
-                                                             Id = _user.Id,
-                                                             UserName = _user.UserName,
-                                                             UserPageLink = $"/User{_user.Id}"
-                                                         };
-
-            return friends.ToList();
+            var friends = friendsIn.Union(friendsOut).ToList(); 
+            foreach (var friend in friends)
+            {
+                friend.UserPageLink = $"/User{friend.Id}";
+            }
+            
+            return friends;
         }
 
         public List<InterlocutorViewModel> GetInterlocutors(string userId)
         {
-            IQueryable<string> friendsIn = from user in _dbContext.Users
-                                                          join ff in _dbContext.FriendshipFacts on user.Id equals ff.InitiatorId
+            IQueryable<string> friendsIn = from ff in _dbContext.FriendshipFacts
                                                           where ff.InvitedId == userId && ff.RequestAccepted == true
-                                                          select user.Id;
-            IQueryable<string> friendsOut = from user in _dbContext.Users
-                                                           join ff in _dbContext.FriendshipFacts on user.Id equals ff.InvitedId
+                                                          select ff.InitiatorId;
+            IQueryable<string> friendsOut = from ff in _dbContext.FriendshipFacts
                                                            where ff.InitiatorId == userId && ff.RequestAccepted == true
-                                                           select user.Id;
-            IQueryable<InterlocutorViewModel> interlocutors = from user in _dbContext.Users
-                                                              join mic in _dbContext.MembershipInChats on user.Id equals mic.UserId
-                                                              where
-                                                              (from chat in _dbContext.Chats
-                                                               join userMic in _dbContext.MembershipInChats on chat.Id equals userMic.ChatId
-                                                               where userMic.UserId == userId && chat.Name == ""
-                                                               select chat.Id).Contains(mic.ChatId) && user.Id != userId && !friendsIn.Contains(user.Id) && !friendsOut.Contains(user.Id)
-                                                              select new InterlocutorViewModel()
-                                                              {
-                                                                  Id = user.Id,
-                                                                  ChatId = mic.ChatId,
-                                                                  UserName = user.UserName,
-                                                                  UserPageLink = $"/User{user.Id}"
-                                                              };
+                                                           select ff.InvitedId;
 
-            var result = interlocutors.ToList(); 
+
+            var userInterlocutors = (from dialog in _dbContext.Dialogs
+                               where dialog.User1Id == userId
+                               select new { userId = dialog.User2Id, chatId = dialog.ChatId })
+                                .Union(
+                                from dialog in _dbContext.Dialogs 
+                                where dialog.User2Id == userId
+                                select new { userId = dialog.User1Id, chatId = dialog.ChatId }
+                                );
+
+
+            var interlocutorsNotFriends = from _user in _dbContext.Users
+                                           join _dialog in userInterlocutors on _user.Id equals _dialog.userId
+                                           where !friendsIn.Union(friendsOut).Contains(_user.Id)
+                                           select new InterlocutorViewModel()
+                                           {
+                                               Id = _user.Id,
+                                               ChatId = _dialog.chatId,
+                                               UserName = _user.UserName,
+                                               UserPageLink = $"/User{_user.Id}"
+                                           };
+
+        //from user in _dbContext.Users
+        //                                              join mic in _dbContext.MembershipInChats on user.Id equals mic.UserId
+        //                                              where
+        //                                              (from chat in _dbContext.Chats
+        //                                               join userMic in _dbContext.MembershipInChats on chat.Id equals userMic.ChatId
+        //                                               where userMic.UserId == userId && chat.Name == ""
+        //                                               select chat.Id).Contains(mic.ChatId) && user.Id != userId && !friendsIn.Contains(user.Id) && !friendsOut.Contains(user.Id)
+        //                                              select new InterlocutorViewModel()
+        //                                              {
+        //                                                  Id = user.Id,
+        //                                                  ChatId = mic.ChatId,
+        //                                                  UserName = user.UserName,
+        //                                                  UserPageLink = $"/User{user.Id}"
+        // };
+
+            var result = interlocutorsNotFriends.ToList(); 
             return result;
         }
 

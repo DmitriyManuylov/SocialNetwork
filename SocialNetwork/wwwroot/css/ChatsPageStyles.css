@@ -1,0 +1,11 @@
+﻿#chatsBlockWrap {
+    display: flex;
+    align-items: center;
+}
+#chatsBlock {
+    min-width: 500px;
+    margin: 10px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 20px;
+}

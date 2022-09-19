@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SocialNetwork.Models.UserInfoModels;
-using SocialNetwork.Models.ViewModels.SocialNetworkViewModels;
+using SocialNetwork.Models.ViewModels.UsersViewModels;
 
 namespace SocialNetwork.Models.Repositories
 {

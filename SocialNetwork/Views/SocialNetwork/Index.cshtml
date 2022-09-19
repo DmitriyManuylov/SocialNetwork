@@ -30,7 +30,7 @@
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionLinks">
                         <div class="accordion-body no-padding">
-                            <div id="comradesAreaWrap">
+                            <div id="comradesAreaWrap" class="chats-list-area-wrap">
                                 <div id="comradesArea">
                                 </div>
                             </div>
@@ -48,9 +48,9 @@
                     </h2>
                     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionLinks">
                         <div class="accordion-body no-padding">
-                            <div id="collectivesAreaWrap">
+                            <div id="collectivesAreaWrap" class="chats-list-area-wrap">
                                 <div id="collectivesArea">
-                                    <button id="butCreateChat" class="w-100 btn btn-outline-secondary">Создать</button>
+                                    <button id="butShowCreationChatDialog" type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#createChatDialog">Создать</button>
                                 </div>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                     </h2>
                     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionLinks">
                         <div class="accordion-body no-padding">
-                            <div id="interlocutorsAreaWrap">
+                            <div id="interlocutorsAreaWrap" class="chats-list-area-wrap">
                                 <div id="interlocutorsArea">
                                 </div>
                             </div>
@@ -74,17 +74,12 @@
                     </div>
                 </div>
             </div>
-
-
-
         </div>
-
 
         <div id="roomsListWrap" class="">
             <div id="roomsList">
             </div>
         </div>
-
     
         @await Html.PartialAsync("ChatFramePartial")
         <div id="rightSide" class="flex-item side-bar">
@@ -142,7 +137,26 @@
             </div>
         </div>
     </div>
+    <div id="createChatDialog" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Создание коллектива</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form>
+                    <div class="modal-body">
+                        <input id="chatNameInput" class="w-100 h-100" type="text" placeholder="Название коллектива" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                        <button id="butCreateChat" type="button" data-bs-dismiss="modal" class="btn btn-primary">Создать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     @section Scripts{
-    <script type="module" src="~/js/SocialNetwork.js"></script>
+    <script type="module" src="~/dist/SocialNetwork.js"></script>
     }
     

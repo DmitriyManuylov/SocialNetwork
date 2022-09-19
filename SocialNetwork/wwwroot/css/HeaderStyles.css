@@ -100,3 +100,16 @@ body {
     flex-direction: row;
     align-items: center;
 }
+#notifications{
+    margin-right: 30px;
+}
+    #notifications img {
+
+    }
+#notifications a {
+    font-size: 1rem;
+    font-weight: 600;
+}
+    #notifications a.dropdown-toggle::after{
+        content: none;
+    }

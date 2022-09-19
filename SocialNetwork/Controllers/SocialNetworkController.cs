@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Diagnostics.CodeAnalysis;
+using SocialNetwork.Models.ViewModels.UsersViewModels;
 
 namespace SocialNetwork.Controllers
 {
@@ -25,22 +26,28 @@ namespace SocialNetwork.Controllers
         IUsersRepository _usersRepository;
         UserManager<NetworkUser> _userManager;
         IHubContext<SocialNetworkHub, ISocialNetworkHubClient> _hubContext;
-        
+
+
         public SocialNetworkController(ISocialNetworkRepository socialNetworkRepository
-                                      ,IUsersRepository usersRepository
-                                      ,UserManager<NetworkUser> userManager
-                                      ,IHubContext<SocialNetworkHub, ISocialNetworkHubClient> hubContext)
+                                      , IUsersRepository usersRepository
+                                      , UserManager<NetworkUser> userManager
+                                      , IHubContext<SocialNetworkHub, ISocialNetworkHubClient> hubContext)
         {
             _socialNetworkRepository = socialNetworkRepository;
             _usersRepository = usersRepository;
             _userManager = userManager;
             _hubContext = hubContext;
         }
+
+
+        [HttpGet]
         public IActionResult Index(int? chatId = null)
         {
             return View(chatId);
         }
 
+
+        [HttpGet]
         public IActionResult Data()
         {
             string userId = _userManager.GetUserId(User);
@@ -49,6 +56,7 @@ namespace SocialNetwork.Controllers
             {
                 model = new SocialLinksViewModel()
                 {
+                    UserId = userId,
                     Chats = _socialNetworkRepository.GetUserChats(userId),
                     Friends = _usersRepository.GetFriends(userId),
                     Interlocutors = _usersRepository.GetInterlocutors(userId)
@@ -61,6 +69,7 @@ namespace SocialNetwork.Controllers
 
             return Ok(model);
         }
+
 
         /// <summary>
         /// Приглашение в друзья
@@ -89,6 +98,7 @@ namespace SocialNetwork.Controllers
             return Ok();
         }
 
+
         /// <summary>
         /// Принятие предложения дружбы
         /// </summary>
@@ -116,8 +126,59 @@ namespace SocialNetwork.Controllers
             _hubContext.Clients.User(calledUserId).FriendshipAccepted(userViewModel);
             return Ok();
         }
-        
-        public async Task<IActionResult> DeleteUser(string calledUserId)
+
+
+        public async Task<IActionResult> CancelFriendshipInvitation(string calledUserId)
+        {
+            string userId = _userManager.GetUserId(User);
+            try
+            {
+                _usersRepository.DeleteFriend(userId, calledUserId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            NetworkUser user = _usersRepository.GetUserById(userId);
+            UserViewModel userViewModel = new UserViewModel()
+            {
+                Id = user.Id,
+                UserPageLink = $"User{user.Id}"
+            };
+            userViewModel.SetFullName(user);
+
+            await _hubContext.Clients.User(calledUserId).FriendshipInvitationCanceled(userViewModel);
+
+            return Ok();
+        }
+
+
+        public async Task<IActionResult> RejectFriendship(string calledUserId)
+        {
+            string userId = _userManager.GetUserId(User);
+            try
+            {
+                _usersRepository.DeleteFriend(userId, calledUserId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            NetworkUser user = _usersRepository.GetUserById(userId);
+            UserViewModel userViewModel = new UserViewModel()
+            {
+                Id = user.Id,
+                UserPageLink = $"User{user.Id}"
+            };
+            userViewModel.SetFullName(user);
+
+            await _hubContext.Clients.User(calledUserId).FriendshipRejected(userViewModel);
+
+            return Ok();
+        }
+
+
+        public async Task<IActionResult> DeleteUserFromFriends(string calledUserId)
         {
             string userId = _userManager.GetUserId(User);
             try
@@ -141,6 +202,36 @@ namespace SocialNetwork.Controllers
             return Ok();
         }
 
+
+        public IActionResult CreateChat(string chatName)
+        {
+            string userId = _userManager.GetUserId(User);
+            GroupChat chat;
+            if (string.IsNullOrEmpty(chatName))
+            {
+                ModelState.AddModelError("chatName", "Не задано название чата");
+                return BadRequest();
+            }
+            try
+            {
+                chat = _socialNetworkRepository.CreateChat(chatName, userId);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+            ChatViewModel chatViewModel = new ChatViewModel()
+            {
+                Id = chat.Id,
+                Name = chat.Name,
+                ChatLink = $"Chat{chat.Id}",
+                IsUserAMember = true
+            };
+            
+            return Ok(chatViewModel);
+        }
+
+
         /// <summary>
         /// Присоединение к чату
         /// </summary>
@@ -151,11 +242,9 @@ namespace SocialNetwork.Controllers
         {
             string userId = _userManager.GetUserId(User);
             GroupChat chat;
-            List<ChatMessageViewModel> messages;
             try
             {
                 chat = _socialNetworkRepository.JoinToChat(chatId, userId);
-                messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
             }
             catch (Exception ex)
             {
@@ -163,11 +252,10 @@ namespace SocialNetwork.Controllers
             }
             NetworkUser thisUser = await _userManager.GetUserAsync(User);
             await _hubContext.Clients.Group(chat.Name).ChatNotifyAsync($"Пользователь {thisUser.UserName} присоединился к коллективу", DateTime.Now.ToString());
-            await _hubContext.Groups.AddToGroupAsync(connectionId, chat.Name);
-           
-            foreach (ChatMessageViewModel message in messages)
-                message.SenderLink = "/User" + userId;
-            return Ok(messages);
+            if (!string.IsNullOrEmpty(connectionId))
+                await _hubContext.Groups.AddToGroupAsync(connectionId, chat.Name);
+
+            return RedirectToAction(nameof(ChatPage), new { chatId = chatId });
         }
 
 
@@ -191,9 +279,11 @@ namespace SocialNetwork.Controllers
             }
             NetworkUser thisUser = await _userManager.GetUserAsync(User);
             await _hubContext.Clients.Group(chat.Name).ChatNotifyAsync($"Пользователь {thisUser.UserName} покинул коллектив", DateTime.Now.ToString());
-            await _hubContext.Groups.RemoveFromGroupAsync(connectionId, chat.Name);
-            return Ok();
+            if (!string.IsNullOrEmpty(connectionId))
+                await _hubContext.Groups.RemoveFromGroupAsync(connectionId, chat.Name);
+            return RedirectToAction(nameof(ChatPage), new { chatId = chatId });
         }
+
 
         public async Task<IActionResult> ConnectToChat(int chatId, string connectionId)
         {
@@ -218,31 +308,8 @@ namespace SocialNetwork.Controllers
             await _hubContext.Groups.AddToGroupAsync(connectionId, chat.Name);
             return Ok(messages);
         }
-        public IActionResult ConnectToDialog(int chatId, string calledUserId)
-        {
-            string userId = _userManager.GetUserId(User);
 
-            GroupChat chat;
 
-            List<ChatMessageViewModel> messages;
-            try
-            {
-                chat = _socialNetworkRepository.GetChatById(chatId);
-                messages = _socialNetworkRepository.GetChatMessages(chatId, userId);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-
-            if (!string.IsNullOrEmpty(chat.Name)) return BadRequest();
-            foreach (ChatMessageViewModel message in messages)
-            {
-                message.SenderLink = "/User" + message.SenderId;
-                message.ChatId = chatId;
-            }
-            return Ok(messages);
-        }
         public async Task<IActionResult> DisconnectFromChat(int chatId, string connectionId)
         {
             string userId = _userManager.GetUserId(User);
@@ -261,6 +328,105 @@ namespace SocialNetwork.Controllers
             return Ok();
         }
 
+
+        public IActionResult GetDialogId(string calledUserId)
+        {
+            string userId = _userManager.GetUserId(User);
+            GroupChat chat;
+            Dialog dialog;
+            try
+            {
+                dialog = _socialNetworkRepository.EnsureGetUsersDialog(userId, calledUserId);
+                chat = dialog.Chat;
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+            return Ok(chat.Id);
+        }
+
+
+        public IActionResult ConnectToDialog(int chatId, string calledUserId)
+        {
+            string userId = _userManager.GetUserId(User);
+
+            List<ChatMessageViewModel> messages;
+            try
+            {
+                messages = _socialNetworkRepository.GetDialogMessages(chatId, userId, calledUserId);
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+            return Ok(messages);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(int chatId, string text)
+        {
+            string userId = _userManager.GetUserId(User);
+            NetworkUser thisUser = await _userManager.GetUserAsync(User);
+
+            Message message;
+            try
+            {
+                message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(thisUser.Id, text, chatId));
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+            ChatMessageViewModel viewModel = new ChatMessageViewModel()
+            {
+                ChatId = chatId,
+                SenderId = userId,
+                SenderName = thisUser.UserName,
+                Text = text,
+                DateTime = message.DateTime.ToString("f"),
+                SenderLink = $"/User{userId}"
+            };
+            await _hubContext.Clients.Group(message.Chat.Name).MessageRecieved(viewModel);
+            return Ok();
+        }
+
+
+        public async Task<IActionResult> SendMessageToInterlocutor(int chatId, string text, string calledUserId)
+        {
+            string userId = _userManager.GetUserId(User);
+            NetworkUser thisUser = await _userManager.GetUserAsync(User);
+            GroupChat chat;
+            Message message;
+            try
+            {
+                chat = _socialNetworkRepository.GetChatById(chatId);
+                message = await Task.Run(() => _socialNetworkRepository.SendMessageToDialog(userId, text, calledUserId));
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+
+            ChatMessageViewModel viewModel = new ChatMessageViewModel()
+            {
+                ChatId = chatId,
+                SenderId = userId,
+                SenderName = thisUser.UserName,
+                Text = text,
+                DateTime = message.DateTime.ToString("f"),
+                SenderLink = $"/User{userId}"
+            };
+            await _hubContext.Clients.Users(userId, calledUserId).MessageRecieved(viewModel);
+
+            return Ok();
+        }
+
+
         public IActionResult UserPage(string Id)
         {
             string userId = _userManager.GetUserId(User);
@@ -275,7 +441,7 @@ namespace SocialNetwork.Controllers
             {
                 return BadRequest();
             }
-            
+
             FriendshipFactStates friendshipFactState = FriendshipFactStates.Friends;
             if (friendshipFact == null) friendshipFactState = FriendshipFactStates.NotFriends;
             else
@@ -287,9 +453,12 @@ namespace SocialNetwork.Controllers
             {
                 User = networkUser,
                 FriendshipFactState = friendshipFactState,
+                Friends = _usersRepository.GetFriends(userId).Select(user => new UserViewModel { Id = userId, UserName = user.UserName, UserPageLink = $"User{user.Id}" }).ToList(),
+                Chats = _socialNetworkRepository.GetUserChats(userId)
             };
             return View(userPageViewModel);
         }
+
 
         [HttpPost]
         public IActionResult FilterUsers(UsersFilter filter)
@@ -306,7 +475,7 @@ namespace SocialNetwork.Controllers
             {
                 return BadRequest();
             }
-            
+
             foreach (NetworkUser user in users)
             {
                 ExtendedUserViewModel createdModelItem = new ExtendedUserViewModel()
@@ -330,78 +499,37 @@ namespace SocialNetwork.Controllers
             return PartialView("FilteredUsersPart", filteredUsers);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> SendMessage(int chatId, string text)
+        public IActionResult ChatPage(int chatId) 
         {
             string userId = _userManager.GetUserId(User);
-            NetworkUser thisUser = await _userManager.GetUserAsync(User);
+            ChatViewModelWithUsers chat = _socialNetworkRepository.GetChatPageViewModel(chatId);
+            chat.IsUserAMember = false;
 
-            Message message;
-            try
+            foreach (var member in chat.Members)
             {
-                message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(thisUser.Id, text, chatId));
+                if (member.Id == userId)
+                {
+                    chat.IsUserAMember = true;
+                    break;
+                }
             }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-           
-            ChatMessageViewModel viewModel = new ChatMessageViewModel()
-            {
-                ChatId = chatId,
-                SenderId = userId,
-                SenderName = thisUser.UserName,
-                Text = text,
-                DateTime = message.DateTime.ToString("f"),
-                SenderLink = $"/User{userId}"
-            };
-            await _hubContext.Clients.Group(message.Chat.Name).MessageRecieved(viewModel);
-            return Ok();
+            return View(chat); 
         }
 
-        public IActionResult GetDialogId(string calledUserId)
+        public IActionResult Chats()
         {
             string userId = _userManager.GetUserId(User);
-            GroupChat chat;
-            try
-            {
-                chat = _socialNetworkRepository.EnsureGetUsersDialog(userId, calledUserId);
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-             
-            return Ok(chat.Id);
+            var userChats = _socialNetworkRepository.GetUserChats(userId);
+            return View(userChats);
         }
-        public async Task<IActionResult> SendMessageToInterlocutor(int chatId, string text, string calledUserId)
+
+        public IActionResult FilterChats(ChatFilter filter)
         {
             string userId = _userManager.GetUserId(User);
-            NetworkUser thisUser = await _userManager.GetUserAsync(User);
-            GroupChat chat;
-            Message message;
-            try
-            {
-                chat = _socialNetworkRepository.GetChatById(chatId);
-                message = await Task.Run(() => _socialNetworkRepository.SendMessageToChat(userId, text, chatId));
-            }
-            catch (Exception)
-            {
-                return BadRequest();
-            }
-            
-            ChatMessageViewModel viewModel = new ChatMessageViewModel()
-            {
-                ChatId = chatId,
-                SenderId = userId,
-                SenderName = thisUser.UserName,
-                Text = text,
-                DateTime = message.DateTime.ToString("f"),
-                SenderLink = $"/User{userId}"
-            };
-            await _hubContext.Clients.Users(userId, calledUserId).MessageRecieved(viewModel);
+            List<ChatViewModel> filteredChats = _socialNetworkRepository.FilterChats(filter, userId);
 
-            return Ok();
+            return PartialView("FilteredChatsPart", filteredChats);
         }
+
     }
 }

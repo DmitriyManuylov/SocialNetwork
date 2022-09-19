@@ -1,4 +1,4 @@
-﻿@using SocialNetwork.Models.ViewModels.SocialNetworkViewModels
+﻿@using SocialNetwork.Models.ViewModels.UsersViewModels
 
 @model NotAcceptedInvitationsViewModel
 @{
@@ -15,8 +15,11 @@
                     Входящие приглашения
                 </h5>
                 <div>
-                    @foreach(var item in Model.IncomingInvitations){
-                        <a class="user-link w-100" asp-controller="SocialNetwork" asp-action="UserPage" asp-route-Id="@item.Id">@item.UserName</a>
+                    @foreach (var item in Model.IncomingInvitations)
+                    {
+                        <div>
+                            <a class="user-link w-100" asp-controller="SocialNetwork" asp-action="UserPage" asp-route-Id="@item.Id">@item.UserName</a>
+                        </div>
                     }
                 </div>
             </div>
@@ -27,7 +30,9 @@
                 <div>
                     @foreach (var item in Model.OutgoingInvitations)
                     {
-                        <a class="user-link w-100" asp-controller="SocialNetwork" asp-action="UserPage" asp-route-Id="@item.Id">@item.UserName</a>
+                        <div>
+                            <a class="user-link w-100" asp-controller="SocialNetwork" asp-action="UserPage" asp-route-Id="@item.Id">@item.UserName</a>
+                        </div>
                     }
                 </div>
             </div>

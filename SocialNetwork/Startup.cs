@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using SocialNetwork.Hubs;
 using SocialNetwork.Models.UserInfoModels;
+using SocialNetwork.Controllers;
 
 namespace SocialNetwork
 {
@@ -33,9 +34,9 @@ namespace SocialNetwork
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
+
         {
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
-            string identityConnectionString = Configuration.GetConnectionString("IdentityConnection");
 
             services.AddDbContext<SocialNetworkDbContext>(options => options.UseSqlServer(connectionString)).AddLogging();
 
@@ -82,7 +83,7 @@ namespace SocialNetwork
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                //app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -102,7 +103,16 @@ namespace SocialNetwork
                 endpoints.MapControllerRoute(
                     name: "",
                     pattern: "User{Id:guid}",
-                    defaults: new { controller = "SocialNetwork", action = "UserPage" });
+                    defaults: new { controller = nameof(SocialNetworkController).Replace("Controller", ""), action = nameof(SocialNetworkController.UserPage) });
+                endpoints.MapControllerRoute(
+                    name: "",
+                    pattern: "Chat{chatId:int}",
+                    defaults: new {controller = nameof(SocialNetworkController).Replace("Controller", ""), action = nameof(SocialNetworkController.ChatPage) }
+                    );
+                endpoints.MapControllerRoute(
+                    name: "",
+                    pattern: "Messenger",
+                    defaults: new { controller = nameof(SocialNetworkController).Replace("Controller", ""), action = nameof(SocialNetworkController.Index) });
 
                 endpoints.MapControllerRoute(
                     name: "",

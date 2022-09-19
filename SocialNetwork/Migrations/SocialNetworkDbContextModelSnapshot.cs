@@ -150,6 +150,36 @@ namespace SocialNetwork.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("SocialNetwork.Models.ChatModels.Dialog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ChatId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("User1Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("User2Id")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId")
+                        .IsUnique();
+
+                    b.HasIndex("User1Id");
+
+                    b.HasIndex("User2Id");
+
+                    b.ToTable("Dialogs");
+                });
+
             modelBuilder.Entity("SocialNetwork.Models.ChatModels.GroupChat", b =>
                 {
                     b.Property<int>("Id")
@@ -444,10 +474,17 @@ namespace SocialNetwork.Migrations
                     b.Property<DateTime>("DateOfConclusion")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("DialogId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("RequestAccepted")
                         .HasColumnType("bit");
 
                     b.HasKey("InitiatorId", "InvitedId");
+
+                    b.HasIndex("DialogId")
+                        .IsUnique()
+                        .HasFilter("[DialogId] IS NOT NULL");
 
                     b.HasIndex("InvitedId");
 
@@ -597,6 +634,33 @@ namespace SocialNetwork.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SocialNetwork.Models.ChatModels.Dialog", b =>
+                {
+                    b.HasOne("SocialNetwork.Models.ChatModels.GroupChat", "Chat")
+                        .WithMany()
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", "User1")
+                        .WithOne()
+                        .HasForeignKey("SocialNetwork.Models.ChatModels.Dialog", "User1Id")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", "User2")
+                        .WithOne()
+                        .HasForeignKey("SocialNetwork.Models.ChatModels.Dialog", "User2Id")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+
+                    b.Navigation("User1");
+
+                    b.Navigation("User2");
+                });
+
             modelBuilder.Entity("SocialNetwork.Models.ChatModels.MembershipInChat", b =>
                 {
                     b.HasOne("SocialNetwork.Models.ChatModels.GroupChat", "Chat")
@@ -659,6 +723,11 @@ namespace SocialNetwork.Migrations
 
             modelBuilder.Entity("SocialNetwork.Models.UserInfoModels.FriendshipFact", b =>
                 {
+                    b.HasOne("SocialNetwork.Models.ChatModels.Dialog", "Dialog")
+                        .WithOne()
+                        .HasForeignKey("SocialNetwork.Models.UserInfoModels.FriendshipFact", "DialogId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SocialNetwork.Models.UserInfoModels.NetworkUser", "Initiator")
                         .WithMany("FriendshipFactsOut")
                         .HasForeignKey("InitiatorId")
@@ -670,6 +739,8 @@ namespace SocialNetwork.Migrations
                         .HasForeignKey("InvitedId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
+
+                    b.Navigation("Dialog");
 
                     b.Navigation("Initiator");
 

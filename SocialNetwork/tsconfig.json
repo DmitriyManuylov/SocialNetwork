@@ -1,0 +1,21 @@
+
+{
+  "compilerOptions": {
+    "moduleResolution": "Node",
+    "noImplicitAny": false,
+    "noEmitOnError": false,
+    "removeComments": false,
+    "allowJs": true,
+    "target": "ES6",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "module": "ES6",
+    "baseUrl": ".",
+    "lib": [ "ES6", "DOM" ],
+    "outDir": "wwwroot/js"
+  },
+  "include": [
+    "Scripts/**/*"
+  ]
+}

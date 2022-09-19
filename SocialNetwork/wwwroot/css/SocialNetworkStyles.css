@@ -14,13 +14,18 @@
     border-radius: 5px;
 }
 
-#comradesAreaWrap {
+.chats-list-area-wrap {
     width: 100%;
     height: calc(100% - 45px);
     overflow-x: hidden;
     overflow-y: auto;
     border-top: double;
     border-top-color: slategrey;
+}
+#butCreateChat{
+    margin: 4px 0;
+}
+#comradesAreaWrap {
 }
 #comradesArea {
     width: 100%;
@@ -31,13 +36,7 @@
 }
 
 #collectivesAreaWrap {
-    width: 100%;
-    min-height: 50%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    max-height: calc(100% - 45px);
-    border-top: double;
-    border-top-color: slategrey;
+
 }
 #collectivesArea {
     width: 100%;
@@ -85,6 +84,7 @@
 }
 #filteredUsersWrap{
     height: calc(100% - 38px);
+    overflow-y: auto;
     padding-top: 5px;
     width: 100%;
 }

@@ -5,6 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Remove="Scripts\App.ts" />
+    <TypeScriptCompile Remove="Scripts\ChatPage.ts" />
+    <TypeScriptCompile Remove="Scripts\Chats.ts" />
+    <TypeScriptCompile Remove="Scripts\SocialNetwork.ts" />
+    <TypeScriptCompile Remove="Scripts\SocNetHtmlGen.ts" />
+    <TypeScriptCompile Remove="Scripts\TypedViewModels.ts" />
+    <TypeScriptCompile Remove="Scripts\UserPage.ts" />
+    <TypeScriptCompile Remove="Scripts\ViewModels.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BundlerMinifier.Core" Version="3.2.449" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.17" />
@@ -20,9 +31,40 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.8.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.2" />
     <PackageReference Include="System.Net.WebSockets.WebSocketProtocol" Version="5.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\Chat\" />
+    <Folder Include="Views\SocialNetwork\Shared\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Scripts\App.ts" />
+    <None Include="Scripts\ChatPage.ts" />
+    <None Include="Scripts\Chats.ts" />
+    <None Include="Scripts\SocialNetwork.ts" />
+    <None Include="Scripts\SocNetHtmlGen.ts" />
+    <None Include="Scripts\TypedViewModels.ts" />
+    <None Include="Scripts\UserPage.ts" />
+    <None Include="Scripts\ViewModels.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.Production.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties tsconfig_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

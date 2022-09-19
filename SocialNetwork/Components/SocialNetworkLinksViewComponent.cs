@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SocialNetwork.Models.Repositories;
 using SocialNetwork.Models.UserInfoModels;
-using SocialNetwork.Models.ViewModels.SocialNetworkViewModels;
+using SocialNetwork.Models.ViewModels.UsersViewModels;
 
 namespace SocialNetwork.Components
 {

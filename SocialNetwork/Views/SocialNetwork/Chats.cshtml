@@ -1,0 +1,53 @@
+﻿@using SocialNetwork.Controllers
+@using SocialNetwork.Models.ViewModels.SocialNetworkViewModels
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<ChatViewModel>
+
+@{
+    Layout = "_MainLayout";
+}
+@section Styles {
+    <link rel="stylesheet" href="/css/ChatsPageStyles.css"/>
+}
+    <div id="chatsBlockWrap">
+        <div id="chatsBlock">
+            <input id="searchInput" type="text" class="form-control w-100" placeholder="Начните вводить название коллектива"/>
+            <div id="userChats">
+                <div id="collectivesArea">
+                    <button id="butShowCreationChatDialog" type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#createChatDialog">Создать</button>
+                </div>
+                <h3>Коллективы, в которых вы состоите</h3>
+            @foreach (var chat in Model)
+            {
+                <div>
+                    <a class="user-link" asp-controller=@nameof(SocialNetworkController).Replace("Controller", "") asp-action=@nameof(SocialNetworkController.ChatPage) asp-route-chatId=@chat.Id>@chat.Name</a>
+                </div>
+            }
+        </div>
+        <div id="filteredChatsWrap">
+        </div>
+    </div>
+</div>
+<div id="createChatDialog" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Создание коллектива</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="chatNameInput" class="w-100 h-100" type="text" placeholder="Название коллектива" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button id="butCreateChat" type="button" data-bs-dismiss="modal" class="btn btn-primary">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="/js/Chats.js"></script>
+}

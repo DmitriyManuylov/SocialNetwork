@@ -1,0 +1,22 @@
+﻿@using SocialNetwork.Controllers
+@using SocialNetwork.Models.ViewModels.SocialNetworkViewModels
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<ChatViewModel>
+
+<div id="filteredChats">
+    <h3>Результаты поиска</h3>
+    @foreach (var chat in Model)
+    {
+        <div>
+            <a class="user-link" asp-controller=@nameof(SocialNetworkController).Replace("Controller", "") asp-action=@nameof(SocialNetworkController.ChatPage) asp-route-chatId=@chat.Id>
+                @chat.Name
+            </a>
+            @if (chat.IsUserAMember)
+            {
+                <small>(Вы состоите в данном коллективе)</small>
+            }
+        </div>
+    }
+</div>

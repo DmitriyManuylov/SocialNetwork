@@ -3,20 +3,23 @@
     align-items: self-start;
 }
 #userInfoWrap {
+    min-width: 500px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
     flex-direction: column;
-
 }
 
 #userInfo {
-    padding: 10px;
+    padding: 20px;
     background-color: white;
+    border-radius: 20px;
 }
 .user-page-row{
     width: 100%;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 15px;
 }
     .user-page-row div:first-child {
         margin-right: 50px;
@@ -24,3 +27,9 @@
     .user-page-row :first-child{
         margin-right: 50px;
     }
+    .user-page-row:last-child {
+        margin-bottom: 0;
+    }
+#usersRelations {
+    align-items: end;
+}

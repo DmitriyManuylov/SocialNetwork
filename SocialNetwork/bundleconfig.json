@@ -100,5 +100,30 @@
     "inputFiles": [
       "wwwroot/js/SocNetHtmlGen.js"
     ]
+  },
+  {
+    "outputFileName": "wwwroot/js/App.min.js",
+    "inputFiles": [
+      "wwwroot/js/App.js"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/ChatPageStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/ChatPageStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/ChatsPageStyles.min.css",
+    "inputFiles": [
+      "wwwroot/css/ChatsPageStyles.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/css/MainBundle.css",
+    "inputFiles": [
+      "wwwroot/css/AppStyles.css",
+      "wwwroot/css/HeaderStyles.css"
+    ]
   }
 ]

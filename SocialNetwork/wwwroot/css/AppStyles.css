@@ -11,6 +11,13 @@
         color: #fc7019;
         text-decoration: underline;
     }
+    #notifications {
+
+    }
+        #notifications ul {
+            padding: 15px;
+            width: max-content;
+        }
 #incomingInvitations{
     border-bottom-width: 1px;
     border-bottom-style: solid;
@@ -18,7 +25,8 @@
 }
 .social-links {
     text-align: center;
-    min-width: 500px;
+    padding: 15px;
+    width: max-content;
 }
 #outgoingInvitations {
 

@@ -1,0 +1,69 @@
+﻿@using SocialNetwork.Controllers
+@using SocialNetwork.Models.ViewModels.SocialNetworkViewModels
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model ChatViewModelWithUsers
+@{
+    Layout = "_MainLayout";
+}
+@section Styles {
+    <link rel="stylesheet" href="/css/ChatPageStyles.css" />
+}
+<input id="chatId" type="hidden" name="chatId" value="@Model.Id"/>
+    <div id="chatPageWrap">
+        <div id="chatPage">
+            <div>
+                <h2>@Model.Name</h2>
+            </div>
+            <div id="buttonsBlock">
+            @if (Model.IsUserAMember)
+            {
+                <div id="membershipBlock">
+                    <label>Вы состоите в данном коллективе</label>
+                    <form method="post" asp-controller=@nameof(SocialNetworkController).Replace("Controller", "") asp-action=@nameof(SocialNetworkController.LeaveFromChat)>
+                        <input type="hidden" name="chatId" value="@Model.Id">
+                        <button type="submit" id="leaveFromChatBut" class="btn btn-outline-secondary">
+                        Покинуть коллектив
+                    </button>
+                    </form>
+                </div>
+                <button id="sendMessageBut" class="btn btn-outline-secondary">
+                    Написать сообщение
+                </button>
+            }
+            else
+            {
+                <div id="membershipBlock">
+                    <form method="post" asp-controller=@nameof(SocialNetworkController).Replace("Controller", "") asp-action=@nameof(SocialNetworkController.JoinToChat)>
+                        <input type="hidden" name="chatId" value="@Model.Id">
+                        <button type="submit" id="joinToChatBut" class="btn btn-outline-secondary">
+                            Присоединиться к коллективу
+                        </button>
+                    </form>
+
+                </div>
+            }
+        </div>
+
+
+        <div>
+            <h3>
+                Количество участников: @Model.Members.Count
+            </h3>
+
+        </div>
+        <div id="membersBlock">
+            <h3>Участники</h3>
+            @foreach (var member in Model.Members)
+            {
+                <div class="chat-member">
+                    <a class="user-link w-100" asp-controller="SocialNetwork" asp-action="UserPage" asp-route-Id="@member.Id">@member.UserName</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="/js/ChatPage.js"></script>
+}

@@ -31,6 +31,8 @@ namespace SocialNetwork.Models
 
         public DbSet<FriendshipFact> FriendshipFacts { get; set; }
 
+        public DbSet<Dialog> Dialogs { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
@@ -45,18 +47,6 @@ namespace SocialNetwork.Models
 
         private void FillStartData(ModelBuilder builder)
         {
-            //NetworkUser IvanIvanov = new NetworkUser("Ivan_Ivanov", "Иван", "Иванов");
-            //NetworkUser Iam = new NetworkUser("Dmitriy_Manuylov", "Дмитрий", "Мануйлов", new DateTime(1997, 5, 13));
-            //Iam.Email = "dmitriy.manuylov@mail.ru";
-            //NetworkUser Petr_Sidorov = new NetworkUser("Petr_Sidorov", "Пётр", "Сидоров", new DateTime(1994, 9, 23));
-            //NetworkUser Sidor_Petrov = new NetworkUser("Sidor_Petrov", "Сидов", "Петров", new DateTime(1987, 2, 7));
-            //NetworkUser Vasiliy_Kuznetsov = new NetworkUser("Kuznetsov_Vasiliy", "Василий", "Кузнецов", new DateTime(2001, 11, 17));
-            //var user1_res = _userManager.CreateAsync(IvanIvanov, "qWeQrt_13y");
-            //var user2_res = _userManager.CreateAsync(Iam, "qWeQrt_14y");
-            //var user3_res = _userManager.CreateAsync(Petr_Sidorov, "qWeQrt_15y");
-            //var user4_res = _userManager.CreateAsync(Sidor_Petrov, "qWeQrt_16y");
-            //var user5_res = _userManager.CreateAsync(Vasiliy_Kuznetsov, "qWeQrt_17y");
-
             Country Russia = new Country() {Id = 1, Name = "Россия" };
             Country Belalus = new Country() { Id = 2, Name = "Белоруссия" };
             Country Germany = new Country() { Id = 3, Name = "Германия" };
@@ -111,29 +101,6 @@ namespace SocialNetwork.Models
                                                 wot_Team_Ne_Probil,
                                                 dog_Breeders_Moscow);
 
-
-            //Task.WaitAll(user1_res, user2_res, user3_res, user4_res, user5_res);
-            //IvanIvanov.City = Sanct_Petersburg;
-            //Iam.City = Rostov_on_Don;
-            //Petr_Sidorov.City = Moscow;
-            //Sidor_Petrov.City = Sochi;
-            //Petr_Sidorov.City = Minsk;
-            //Vasiliy_Kuznetsov.City = Saratov;
-
-            //IvanIvanov.Chats.Add(csTeam_Streltsi);
-            //IvanIvanov.Chats.Add(basketball_Saratov);
-            //Iam.Chats.Add(football_Rostov);
-            //Iam.Chats.Add(dog_Breeders_Moscow);
-            //Iam.Chats.Add(wot_Team_Ne_Probil);
-            //Petr_Sidorov.Chats.Add(csTeam_Streltsi);
-            //Petr_Sidorov.Chats.Add(dog_Breeders_Moscow);
-            //Petr_Sidorov.Chats.Add(football_Rostov);
-            //Sidor_Petrov.Chats.Add(dog_Breeders_Moscow);
-            //Sidor_Petrov.Chats.Add(valleyball_Sochi);
-            //Vasiliy_Kuznetsov.Chats.Add(valleyball_Sochi);
-            //Vasiliy_Kuznetsov.Chats.Add(csTeam_Streltsi);
-            //Vasiliy_Kuznetsov.Chats.Add(wot_Team_Ne_Probil);
-
         }
         private void ConfigurateTables(ModelBuilder builder)
         {
@@ -169,6 +136,13 @@ namespace SocialNetwork.Models
                     .WithMany(user => user.MembershipInChats)
                     .HasForeignKey(mic => mic.UserId),
                 mic => mic.ToTable("MembershipInChats"));
+            builder.Entity<Dialog>().HasOne(dialog => dialog.User1).WithOne().OnDelete(DeleteBehavior.ClientCascade);
+            builder.Entity<Dialog>().HasOne(dialog => dialog.User2).WithOne().OnDelete(DeleteBehavior.ClientCascade);
+            builder.Entity<FriendshipFact>().HasOne(ff => ff.Dialog).WithOne().OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Dialog>().HasIndex(dialog => dialog.User1Id).IsUnique(false);
+            builder.Entity<Dialog>().HasIndex(dialog => dialog.User2Id).IsUnique(false);
+            builder.Entity<Dialog>().HasIndex(dialog => dialog.ChatId).IsUnique(true);
+
         }
     }
 }
