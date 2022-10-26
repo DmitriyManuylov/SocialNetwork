@@ -11,6 +11,6 @@ namespace SocialNetwork.Models.UserInfoModels
 
         public Country Country { get; set; }
 
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
     }
 }

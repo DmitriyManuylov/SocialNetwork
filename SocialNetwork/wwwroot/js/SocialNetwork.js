@@ -212,7 +212,9 @@ function InitialSelectChat(chatId) {
         chatBut.parentElement.parentElement.parentElement.parentElement.parentElement.previousElementSibling.firstElementChild.click();
     }
 }
-window.addEventListener("load", () => hubConnection.start().then(init));
+window.addEventListener("load", () => {
+    hubConnection.start().then(init);
+});
 function GetDialogId(userId) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!userId)
