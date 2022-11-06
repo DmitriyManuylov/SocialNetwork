@@ -46,6 +46,7 @@ async function CreateChat() {
 
     let formData = new FormData();
     formData.append("chatName", chatName);
+    formData.append("connectionId", hubConnection.connectionId);
 
     let createChatResponse = await fetch(createChatUrl, {
         method: "POST",

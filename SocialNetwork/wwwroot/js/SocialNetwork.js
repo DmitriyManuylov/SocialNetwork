@@ -44,6 +44,7 @@ function CreateChat() {
         let createChatUrl = new URL("/SocialNetwork/CreateChat", location.origin);
         let formData = new FormData();
         formData.append("chatName", chatName);
+        formData.append("connectionId", hubConnection.connectionId);
         let createChatResponse = yield fetch(createChatUrl, {
             method: "POST",
             body: formData

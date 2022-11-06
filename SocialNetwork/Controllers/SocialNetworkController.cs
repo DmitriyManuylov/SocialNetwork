@@ -203,7 +203,7 @@ namespace SocialNetwork.Controllers
         }
 
 
-        public IActionResult CreateChat(string chatName)
+        public async Task<IActionResult> CreateChat(string chatName, string connectionId)
         {
             string userId = _userManager.GetUserId(User);
             GroupChat chat;
@@ -227,7 +227,10 @@ namespace SocialNetwork.Controllers
                 ChatLink = $"Chat{chat.Id}",
                 IsUserAMember = true
             };
-            
+
+            if (!string.IsNullOrEmpty(connectionId))
+                await _hubContext.Groups.AddToGroupAsync(connectionId, chat.Name);
+
             return Ok(chatViewModel);
         }
 
