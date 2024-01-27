@@ -67,18 +67,23 @@ namespace SocialNetwork.Models.Repositories
             if (!string.IsNullOrEmpty(usersFilter.Name))
             {
                 string[] nameParts = usersFilter.Name.Split(' ');
-                if (nameParts.Length == 1) users = users.Where(user => EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%")
+                if (nameParts.Length == 1)
+                {
+                    users = users.Where(user => EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%")
                                                                            ||
                                                                        EF.Functions.Like(user.Surname, $"%{nameParts[0]}%"));
+                }
 
-                else 
-                if (nameParts.Length == 2) users = users.Where(user => (EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%")
+                else if (nameParts.Length == 2)
+                {
+                    users = users.Where(user => (EF.Functions.Like(user.FirstName, $"%{nameParts[0]}%")
                                                                            &&
                                                                         EF.Functions.Like(user.Surname, $"%{nameParts[1]}%"))
                                                                            ||
                                                                        (EF.Functions.Like(user.FirstName, $"%{nameParts[1]}%")
                                                                            &&
                                                                         EF.Functions.Like(user.Surname, $"%{nameParts[0]}%")));
+                }
             }
             if (usersFilter.StartAge.HasValue)
             {
@@ -95,7 +100,6 @@ namespace SocialNetwork.Models.Repositories
             }
             var result = users.ToList();
             return result;
-
         }
 
         public void SetCityInUsersInfo(string cityName, NetworkUser user)
@@ -199,7 +203,7 @@ namespace SocialNetwork.Models.Repositories
             FriendshipFact friendshipFactIn = invited.FriendshipFactsIn.FirstOrDefault(fact => fact.InitiatorId == invitorId && fact.InvitedId == invitedId);
             FriendshipFact friendshipFactOut = invited.FriendshipFactsOut.FirstOrDefault(fact => fact.InitiatorId == invitedId && fact.InvitedId == invitorId);
 
-            if (friendshipFactOut != null) throw new FriendshipException("Приглашение отплавлено данным пользователем(принимать должен второй пользователь)");
+            if (friendshipFactOut != null) throw new FriendshipException("Приглашение отправлено данным пользователем(принимать должен второй пользователь)");
             if (friendshipFactIn == null) throw new FriendshipException("Приглашение дружить не поступало");
             if (friendshipFactIn.RequestAccepted) throw new FriendshipException("Приглашение о дружбе уже было принято");
 
@@ -208,7 +212,7 @@ namespace SocialNetwork.Models.Repositories
             Dialog dialog = _dbContext.Dialogs.Where(dialog => (dialog.User1Id == invitorId && dialog.User2Id == invited.Id) 
                                                                     ||
                                                               (dialog.User2Id == invitorId && dialog.User1Id == invited.Id))
-                                                .FirstOrDefault();
+                                              .FirstOrDefault();
             if (dialog != null)
                 friendshipFactIn.DialogId = dialog.Id;
 
@@ -275,40 +279,23 @@ namespace SocialNetwork.Models.Repositories
 
 
             var userInterlocutors = (from dialog in _dbContext.Dialogs
-                               where dialog.User1Id == userId
-                               select new { userId = dialog.User2Id, chatId = dialog.ChatId })
-                                .Union(
-                                from dialog in _dbContext.Dialogs 
-                                where dialog.User2Id == userId
-                                select new { userId = dialog.User1Id, chatId = dialog.ChatId }
-                                );
-
+                                     where dialog.User1Id == userId
+                                     select new { userId = dialog.User2Id, chatId = dialog.ChatId })
+                                     .Union(
+                                     from dialog in _dbContext.Dialogs 
+                                     where dialog.User2Id == userId
+                                     select new { userId = dialog.User1Id, chatId = dialog.ChatId });
 
             var interlocutorsNotFriends = from _user in _dbContext.Users
-                                           join _dialog in userInterlocutors on _user.Id equals _dialog.userId
-                                           where !friendsIn.Union(friendsOut).Contains(_user.Id)
-                                           select new InterlocutorViewModel()
-                                           {
-                                               Id = _user.Id,
-                                               ChatId = _dialog.chatId,
-                                               UserName = _user.UserName,
-                                               UserPageLink = $"/User{_user.Id}"
-                                           };
-
-        //from user in _dbContext.Users
-        //                                              join mic in _dbContext.MembershipInChats on user.Id equals mic.UserId
-        //                                              where
-        //                                              (from chat in _dbContext.Chats
-        //                                               join userMic in _dbContext.MembershipInChats on chat.Id equals userMic.ChatId
-        //                                               where userMic.UserId == userId && chat.Name == ""
-        //                                               select chat.Id).Contains(mic.ChatId) && user.Id != userId && !friendsIn.Contains(user.Id) && !friendsOut.Contains(user.Id)
-        //                                              select new InterlocutorViewModel()
-        //                                              {
-        //                                                  Id = user.Id,
-        //                                                  ChatId = mic.ChatId,
-        //                                                  UserName = user.UserName,
-        //                                                  UserPageLink = $"/User{user.Id}"
-        // };
+                                          join _dialog in userInterlocutors on _user.Id equals _dialog.userId
+                                          where !friendsIn.Union(friendsOut).Contains(_user.Id)
+                                          select new InterlocutorViewModel()
+                                          {
+                                              Id = _user.Id,
+                                              ChatId = _dialog.chatId,
+                                              UserName = _user.UserName,
+                                              UserPageLink = $"/User{_user.Id}"
+                                          };
 
             var result = interlocutorsNotFriends.ToList(); 
             return result;

@@ -211,6 +211,8 @@ namespace SocialNetwork.Models.Repositories
             _dbContext.SaveChanges();
             return chat;
         }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -236,6 +238,7 @@ namespace SocialNetwork.Models.Repositories
             return message;
         }
 
+
         public Message SendMessageToDialog(string senderId, string text, string interlocutorId)
         {
             NetworkUser user = _dbContext.Users.FirstOrDefault(user => user.Id == senderId);
@@ -252,6 +255,7 @@ namespace SocialNetwork.Models.Repositories
             _dbContext.SaveChanges();
             return message;
         }
+
 
         /// <summary>
         /// 
