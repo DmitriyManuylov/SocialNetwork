@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SocialNetwork.Models;
 using SocialNetwork.Models.Repositories;
+using Npgsql.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace SocialNetwork
         {
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
 
-            services.AddDbContext<SocialNetworkDbContext>(options => options.UseSqlServer(connectionString)).AddLogging();
+            services.AddDbContext<SocialNetworkDbContext>(options => options.UseNpgsql(connectionString)).AddLogging();
 
             services.AddScoped<ILiteChatRoomsRepository, EFLiteChatRoomsRepository>();
             services.AddScoped<ISocialNetworkRepository, EFSocialNetworkRepository>();

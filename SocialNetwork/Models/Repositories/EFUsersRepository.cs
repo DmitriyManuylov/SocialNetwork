@@ -11,7 +11,6 @@ using System.Linq;
 namespace SocialNetwork.Models.Repositories
 {
 
-
     public class EFUsersRepository : IUsersRepository
     {
         private SocialNetworkDbContext _dbContext;

@@ -1,6 +1,5 @@
 ﻿using SocialNetwork.Models.Exceptions;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System;
 using SocialNetwork.Models.ViewModels.LiteChatViewModels;
