@@ -7,6 +7,7 @@ using SocialNetwork.Models.ViewModels.UsersViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SocialNetwork.Models.Repositories
 {
@@ -14,9 +15,11 @@ namespace SocialNetwork.Models.Repositories
     public class EFUsersRepository : IUsersRepository
     {
         private SocialNetworkDbContext _dbContext;
-        public EFUsersRepository(SocialNetworkDbContext dbContext)
+        UserManager<NetworkUser> _userManager;
+        public EFUsersRepository(SocialNetworkDbContext dbContext, UserManager<NetworkUser> userManager)
         {
             _dbContext = dbContext;
+            _userManager = userManager;
         }
 
         public IQueryable<NetworkUser> Users => _dbContext.Users;
@@ -41,6 +44,7 @@ namespace SocialNetwork.Models.Repositories
 
         public NetworkUser UpdateUser(NetworkUser user)
         {
+            _userManager.UpdateAsync(user).Wait();
             _dbContext.Users.Update(user);
             _dbContext.SaveChanges();
             return user;
@@ -114,6 +118,7 @@ namespace SocialNetwork.Models.Repositories
             }
                 
             user.City = city;
+            user.CityId = city.Id;
 
             _dbContext.SaveChanges();
         }
@@ -131,6 +136,7 @@ namespace SocialNetwork.Models.Repositories
                 _dbContext.Countries.Add(country);
             }
             user.Country = country;
+            user.CountryId = country.Id;
             _dbContext.SaveChanges();
 
         }
