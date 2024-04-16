@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SocialNetwork.Models;
 using SocialNetwork.Models.Repositories;
 using SocialNetwork.Models.UserInfoModels;
+using SocialNetwork.ServiceEntitiies;
 using System;
 
 namespace SocialNetwork
@@ -22,6 +24,7 @@ namespace SocialNetwork
                 {
                     var userManager = services.GetRequiredService<UserManager<NetworkUser>>();
                     var dbContext = services.GetRequiredService<SocialNetworkDbContext>();
+                    dbContext.Database.Migrate();
                     var usersRepository = services.GetRequiredService<IUsersRepository>();
                     UserDataInitialiser.Initialize(userManager, dbContext, usersRepository);
                 }
@@ -43,6 +46,7 @@ namespace SocialNetwork
                     {
                         logging.AddConsole();
                     });
+
                 });
     }
 }
