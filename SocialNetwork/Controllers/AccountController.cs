@@ -100,7 +100,7 @@ namespace SocialNetwork.Controllers
                 user.SetAge();
             }
             user.Gender = model.Gender;
-            return RedirectToAction(nameof(HomeController.Index), nameof(HomeController).Replace("Controller", ""));
+            return RedirectToAction(nameof(SocialNetworkController.Index), nameof(SocialNetworkController).Replace("Controller", ""));
             
             
         }
@@ -217,12 +217,17 @@ namespace SocialNetwork.Controllers
                 _usersRepository.SetCountryInUsersInfo(model.Country, user);
             }
 
-            if (string.IsNullOrEmpty(model.Name))
-                user.FirstName = model.FirstName;
-            if (string.IsNullOrEmpty(model.LastName))
-                user.Surname = model.LastName;
-            if (string.IsNullOrEmpty(model.Email))
-                user.Email = model.Email;
+            if (!string.IsNullOrEmpty(model.Name))
+            {
+                user.UserName = model.Name;
+            }
+
+            user.FirstName = model.FirstName;
+
+            user.Surname = model.LastName;
+
+            user.Email = model.Email;
+
             if (model.BirthDate.HasValue)
             {
                 user.BirthDate = model.BirthDate;
@@ -230,7 +235,7 @@ namespace SocialNetwork.Controllers
             }
             user.Gender = model.Gender;
             _usersRepository.UpdateUser(user);
-            return RedirectToAction(nameof(Index),nameof(SocialNetworkController).Replace("Controller",""));
+            return RedirectToAction(nameof(Index), nameof(SocialNetworkController).Replace("Controller", ""));
         }
     }
 }
