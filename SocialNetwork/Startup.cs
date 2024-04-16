@@ -10,13 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SocialNetwork.Models;
 using SocialNetwork.Models.Repositories;
-using Npgsql.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+
 using SocialNetwork.Hubs;
 using SocialNetwork.Models.UserInfoModels;
 using SocialNetwork.Controllers;
@@ -37,7 +31,7 @@ namespace SocialNetwork
         public void ConfigureServices(IServiceCollection services)
 
         {
-            string connectionString = Configuration.GetConnectionString("DefaultConnection");
+            string connectionString = Configuration.GetConnectionString("PostgreSqlConnection");
 
             services.AddDbContext<SocialNetworkDbContext>(options => options.UseNpgsql(connectionString)).AddLogging();
 
@@ -47,7 +41,7 @@ namespace SocialNetwork
 
             services.AddIdentity<NetworkUser, IdentityRole>(options =>
             {
-                //options.Password.
+
             })
             .AddEntityFrameworkStores<SocialNetworkDbContext>()
             .AddDefaultTokenProviders();
