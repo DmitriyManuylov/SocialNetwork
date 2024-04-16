@@ -1,0 +1,190 @@
+{
+  "Countries": [
+    {
+      "Id": 1,
+      "Name": "Россия"
+    },
+    {
+      "Id": 2,
+      "Name": "Белоруссия"
+    },
+    {
+      "Id": 3,
+      "Name": "Германия"
+    },
+    {
+      "Id": 4,
+      "Name": "Китай"
+    },
+    {
+      "Id": 5,
+      "Name": "Франция"
+    }
+  ],
+  "Cities": [
+    {
+      "Id": 1,
+      "Name": "Санкт-Петербург",
+      "CountryId": 1
+    },
+    {
+      "Id": 2,
+      "Name": "Москва",
+      "CountryId": 1
+    },
+    {
+      "Id": 3,
+      "Name": "Ростов-на-Дону",
+      "CountryId": 1
+    },
+    {
+      "Id": 4,
+      "Name": "Сочи",
+      "CountryId": 1
+    },
+    {
+      "Id": 5,
+      "Name": "Саратов",
+      "CountryId": 1
+    },
+    {
+      "Id": 6,
+      "Name": "Иркутск",
+      "CountryId": 1
+    },
+    {
+      "Id": 7,
+      "Name": "Минск",
+      "CountryId": 2
+    },
+    {
+      "Id": 8,
+      "Name": "Гомель",
+      "CountryId": 2
+    },
+    {
+      "Id": 9,
+      "Name": "Берлин",
+      "CountryId": 3
+    },
+    {
+      "Id": 10,
+      "Name": "Мюнхен",
+      "CountryId": 3
+    },
+    {
+      "Id": 11,
+      "Name": "Пекин",
+      "CountryId": 4
+    },
+    {
+      "Id": 12,
+      "Name": "Ухань",
+      "CountryId": 4
+    },
+    {
+      "Id": 13,
+      "Name": "Париж",
+      "CountryId": 5
+    }
+  ],
+  "Chats": [
+      {
+        "Id": 1,
+        "Name": "Пинатели мяча в Ростове-на-Дону"
+      },
+      {
+        "Id": 2,
+        "Name": "Швырятели мяча в Саратове"
+      },
+      {
+        "Id": 3,
+        "Name": "Пинатели мяча руками в Сочи"
+      },
+      {
+        "Id": 4,
+        "Name": "Любители погонять в CS \"Стрельцы\""
+      },
+      {
+        "Id": 5,
+        "Name": "Клуб любителей World of Tanks - \"Не пробил\""
+      },
+      {
+        "Id": 6,
+        "Name": "Собаководы Москвы"
+      }
+  ],
+  "Users": [
+    {
+      "Name": "IvanIvanov",
+      "FirstName": "Иван",
+      "LastName": "Иванов",
+      "Password": "qWeQrt_13y",
+      "CityId": 3,
+      "Chats": [ 1, 3 ]
+    },
+    {
+      "Name": "DmitriyManuylov",
+      "FirstName": "Дмитрий",
+      "LastName": "Мануйлов",
+      "Password": "qWeQrt_14y",
+      "CityId": 2,
+      "Chats": [ 2, 3, 4 ]
+    },
+    {
+      "Name": "PetrSidorov",
+      "FirstName": "Пётр",
+      "LastName": "Сидоров",
+      "Password": "qWeQrt_15y",
+      "CityId": 5,
+      "Chats": [5, 0, 1]
+    },
+    {
+      "Name": "SidorPetrov",
+      "FirstName": "Сидор",
+      "LastName": "Петров",
+      "Password": "qWeQrt_16y",
+      "CityId": 3,
+      "Chats": [ 4, 2, 3 ]
+    },
+    {
+      "Name": "VasiliyKuznetsov",
+      "FirstName": "Василий",
+      "LastName": "Кузнецов",
+      "Gender": "Male",
+      "Password": "qWeQrt_17y",
+      "CityId": 6,
+      "Chats": [ 4, 0 ]
+    }
+  ],
+  "FriendshipFacts": [
+    {
+      "InitiatorId": 2,
+      "InvitedId": 1
+    },
+    {
+      "InitiatorId": 3,
+      "InvitedId": 2
+    },
+    {
+      "InitiatorId": 4,
+      "InvitedId": 2
+    },
+    {
+      "InitiatorId": 4,
+      "InvitedId": 1
+    },
+    {
+      "InitiatorId": 2,
+      "InvitedId": 1
+    },
+    {
+      "InitiatorId": 1,
+      "InvitedId": 4
+    },
+    {
+      "InitiatorId": 4,
+      "InvitedId": 3
+    }
+  ]
+}

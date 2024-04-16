@@ -2,12 +2,15 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
+using System.Text.Json;
 using SocialNetwork.Models.ChatModels;
 using SocialNetwork.Models.LiteChatModels;
 using SocialNetwork.Models.UserInfoModels;
 using System;
 using System.Data.Common;
 using System.Threading.Tasks;
+using SocialNetwork.ServiceEntities;
+using System.IO;
 
 namespace SocialNetwork.Models
 {
@@ -47,59 +50,17 @@ namespace SocialNetwork.Models
 
         private void FillStartData(ModelBuilder builder)
         {
-            Country Russia = new Country() {Id = 1, Name = "Россия" };
-            Country Belalus = new Country() { Id = 2, Name = "Белоруссия" };
-            Country Germany = new Country() { Id = 3, Name = "Германия" };
-            Country China = new Country() { Id = 4, Name = "Китай" };
-            Country France = new Country() { Id = 5, Name = "Франция" };
+            StartDataModel startDataModel;
+            using (FileStream fs = new FileStream("StartData.json", FileMode.Open))
+            {
+                startDataModel = JsonSerializer.DeserializeAsync<StartDataModel>(fs).Result;
+            }
 
-            builder.Entity<Country>().HasData(Russia, 
-                                              Belalus, 
-                                              Germany, 
-                                              China, 
-                                              France);
+            builder.Entity<Country>().HasData(startDataModel.Countries);
 
-            City Sanct_Petersburg = new City() { Id = 1, Name = "Санкт-Петербург", CountryId = Russia.Id };
-            City Moscow = new City() { Id = 2, Name = "Москва", CountryId = Russia.Id };
-            City Rostov_on_Don = new City { Id = 3, Name = "Ростов-на-Дону", CountryId = Russia.Id };
-            City Sochi = new City() { Id = 4, Name = "Сочи", CountryId = Russia.Id };
-            City Saratov = new City() { Id = 5, Name = "Саратов", CountryId = Russia.Id };
-            City Irkutsk = new City() { Id = 6, Name = "Иркутск", CountryId = Russia.Id };
-            City Minsk = new City() { Id = 7, Name = "Минск", CountryId = Belalus.Id };
-            City Gomel = new City() { Id = 8, Name = "Гомель", CountryId = Belalus.Id };
-            City Berlin = new City() { Id = 9, Name = "Берлин", CountryId = Germany.Id };
-            City Munhen = new City() { Id = 10, Name = "Мюнхен", CountryId = Germany.Id };
-            City Pekin = new City() { Id = 11, Name = "Пекин", CountryId = China.Id };
-            City Uhan = new City() { Id = 12, Name = "Ухань", CountryId = China.Id };
-            City Paris = new City() { Id = 13, Name = "Париж", CountryId = France.Id };
+            builder.Entity<City>().HasData(startDataModel.Cities);
 
-            builder.Entity<City>().HasData(Sanct_Petersburg,
-                                           Moscow,
-                                           Rostov_on_Don,
-                                           Sochi,
-                                           Saratov,
-                                           Irkutsk,
-                                           Minsk,
-                                           Gomel,
-                                           Berlin,
-                                           Munhen,
-                                           Pekin,
-                                           Uhan,
-                                           Paris);
-
-            GroupChat football_Rostov = new GroupChat() {Id = 1, Name = "Пинатели мяча в Ростове-на-Дону" };
-            GroupChat basketball_Saratov = new GroupChat() { Id = 2, Name = "Швырятели мяча в Саратове" };
-            GroupChat valleyball_Sochi = new GroupChat() { Id = 3, Name = "Пинатели мяча руками в Сочи" };
-            GroupChat csTeam_Streltsi = new GroupChat() { Id = 4, Name = "Любители погонять в CS \"Стрельцы\"" };
-            GroupChat wot_Team_Ne_Probil = new GroupChat() { Id = 5, Name = "Клуб любителей World of Tanks - \"Не пробил\"" };
-            GroupChat dog_Breeders_Moscow = new GroupChat() { Id = 6, Name = "Собаководы Москвы" };
-
-            builder.Entity<GroupChat>().HasData(football_Rostov,
-                                                basketball_Saratov,
-                                                valleyball_Sochi,
-                                                csTeam_Streltsi,
-                                                wot_Team_Ne_Probil,
-                                                dog_Breeders_Moscow);
+            builder.Entity<GroupChat>().HasData(startDataModel.Chats);
 
         }
         private void ConfigurateTables(ModelBuilder builder)
